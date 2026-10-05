@@ -1,0 +1,7 @@
+coleta/cache/
+site/dados.json
+__pycache__/
+*.parcial
+.playwright-mcp/
+site/todos/
+site/*.json
