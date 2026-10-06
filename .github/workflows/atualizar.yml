@@ -40,11 +40,15 @@ jobs:
         run: python coleta/coletar.py
 
       - name: Guardar no repositório o que mudou
+        continue-on-error: true # o GitHub às vezes recusa o push (erro 500): o site publica mesmo assim
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add dados/
-          git diff --cached --quiet || (git commit -m "Atualiza dados [skip ci]" && git pull --rebase && git push)
+          git diff --cached --quiet && exit 0
+          git commit -m "Atualiza dados [skip ci]"
+          for tentativa in 1 2 3; do git pull --rebase && git push && exit 0; sleep 20; done
+          exit 1
 
       # o site vai para a branch gh-pages num commit só (force_orphan): os dados não acumulam histórico
       - name: Publicar no GitHub Pages
