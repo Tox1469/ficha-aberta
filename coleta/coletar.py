@@ -161,7 +161,8 @@ def em_exercicio():
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(4) as pool:
         cpfs = list(pool.map(lambda i: pegar(f"{CAMARA}/{i}")["dados"]["cpf"], ids))
-    dados = {"senado": [[x["UfParlamentar"], norm_nome(x["NomeCompletoParlamentar"])] for x in senado],
+    # quem acabou de tomar posse pode vir sem "UfParlamentar" (06/10/2026): fica com UF vazia e liga só pelo nome
+    dados = {"senado": [[x.get("UfParlamentar", ""), norm_nome(x["NomeCompletoParlamentar"])] for x in senado],
              "camara": [so_digitos(c).zfill(11) for c in cpfs if c]}
     if len(dados["senado"]) < 70 or len(dados["camara"]) < 450:
         raise RuntimeError(f"lista de parlamentares incompleta: {len(dados['senado'])} / {len(dados['camara'])}")
@@ -180,7 +181,7 @@ def marcar_no_cargo(pessoas):
         for c in sorted(cs, key=lambda c: c["ano"], reverse=True):  # uma vaga só por pessoa: a candidatura mais nova
             if c["cargo"] in CARGOS_SENADO:
                 c["nc"] = (not senado_marcado and c["ano"] in (2018, 2022)
-                           and (c["uf"], norm_nome(c["nome"])) in senado)
+                           and {(c["uf"], norm_nome(c["nome"])), ("", norm_nome(c["nome"]))} & senado != set())
                 senado_marcado = senado_marcado or c["nc"]
             elif c["cargo"] == "DEPUTADO FEDERAL":
                 c["nc"] = c["ano"] == 2022 and bool(c["cpf"]) and c["cpf"] in camara
@@ -570,8 +571,10 @@ def montar():
 
 EMPRESAS_POLITICOS = RAIZ / "dados" / "empresas_politicos.json.gz"
 SOCIOS = {}  # começo do CNPJ (8 dígitos, vale para matriz e filiais) -> {número da candidatura: sócio desde AAAA-MM-DD}
+ENTIDADES = {}  # o mesmo para associação, fundação e cooperativa que o político dirige (não tem dono: lista separada)
 # pessoa -> (onde, fornecedor, cnpj) -> [valor, primeira data, última data, prova]
 PROPRIA = defaultdict(lambda: defaultdict(lambda: [0.0, "9999-99-99", "0000-00-00", ""]))
+DIRIGIDA = defaultdict(lambda: defaultdict(lambda: [0.0, "9999-99-99", "0000-00-00", ""]))
 
 
 def tem_dono(natureza):
@@ -585,16 +588,17 @@ def carregar_socios():
     if EMPRESAS_POLITICOS.exists():
         for sqs, empresas in json.loads(gzip.decompress(EMPRESAS_POLITICOS.read_bytes()))["pessoas"]:
             for cnpj, _, _, desde, natureza in empresas:
-                if tem_dono(natureza):
-                    SOCIOS.setdefault(cnpj[:8], {}).update((sq, desde or "9999") for sq in sqs)
+                indice = SOCIOS if tem_dono(natureza) else ENTIDADES if natureza[:1] == "3" or natureza == "2143" else None
+                if indice is not None:
+                    indice.setdefault(cnpj[:8], {}).update((sq, desde or "9999") for sq in sqs)
 
 
-def pago_a_propria(chave, cs, cnpj, data, fornecedor, valor, onde, prova=""):
+def pago_a_propria(chave, cs, cnpj, data, fornecedor, valor, onde, prova="", indice=SOCIOS, destino=PROPRIA):
     """Anota dinheiro público pago a empresa em que o próprio político JÁ era sócio na data do pagamento.
     A Receita só mostra o quadro de sócios de hoje: quem saiu antes não aparece (fica de fora, não acusa à toa)."""
-    desde = SOCIOS.get(cnpj[:8]) if len(cnpj) == 14 and data else None
+    desde = indice.get(cnpj[:8]) if len(cnpj) == 14 and data else None
     if desde and any(desde.get(c["sq"], "9999") <= data for c in cs):
-        p = PROPRIA[chave][(onde, fornecedor, cnpj)]
+        p = destino[chave][(onde, fornecedor, cnpj)]
         p[0] += valor
         p[1], p[2] = min(p[1], data), max(p[2], data)
         p[3] = p[3] or prova
@@ -608,7 +612,7 @@ def montar_empresas(pessoas):
         return None
     dados = json.loads(gzip.decompress(EMPRESAS_POLITICOS.read_bytes()))
     chave_de = {c["sq"]: chave for chave, cs in pessoas.items() for c in cs}
-    pedacos, lista = defaultdict(dict), []
+    pedacos, lista, entidades = defaultdict(dict), [], []
     for sqs, empresas in dados["pessoas"]:
         chave = chave_de.get(sqs[0])
         if not chave:
@@ -618,10 +622,15 @@ def montar_empresas(pessoas):
         item = {"e": [e[:4] for e in empresas], "p": pag}
         for sq in sqs:
             pedacos[sq[-2:]][sq] = item
+        c = max(pessoas[chave], key=lambda c: c["ano"])
         if pag:
-            c = max(pessoas[chave], key=lambda c: c["ano"])
             lista.append([linha_todos(c, not chave.startswith("sq")), sum(p[3] for p in pag),
                           sorted({p[0].split("|")[0] for p in pag})])
+        papel = {e[0][:8]: e[2] for e in empresas}
+        ent = sorted(([onde, forn.title(), cnpj, round(v), de, ate, papel.get(cnpj[:8], "")]
+                      for (onde, forn, cnpj), (v, de, ate, _) in DIRIGIDA[chave].items()), key=lambda p: -p[3])
+        if ent:
+            entidades.append([linha_todos(c, not chave.startswith("sq")), sum(p[3] for p in ent), ent])
     pasta = SAIDA.parent / "empresas"
     shutil.rmtree(pasta, ignore_errors=True)
     pasta.mkdir()
@@ -629,9 +638,12 @@ def montar_empresas(pessoas):
         gravar_json(pasta / f"{pedaco}.json", d)
     lista.sort(key=lambda x: -x[1])
     gravar_json(pasta / "lista.json", {"mes": dados["mes"], "lista": lista})
+    entidades.sort(key=lambda x: -x[1])
+    gravar_json(pasta / "entidades.json", {"mes": dados["mes"], "lista": entidades})
     total = sum(x[1] for x in lista)
     print(f"empresas: {len(dados['pessoas'])} políticos sócios; R$ {total / 1e6:.1f} mi de dinheiro público "
-          f"para empresas de {len(lista)} deles", file=sys.stderr)
+          f"para empresas de {len(lista)} deles; R$ {sum(x[1] for x in entidades) / 1e6:.1f} mi para entidades "
+          f"dirigidas por {len(entidades)}", file=sys.stderr)
     return {"total": total, "pessoas": len(lista), "mes": dados["mes"]}
 
 
@@ -707,7 +719,7 @@ def montar_emendas(pessoas, saida):
             c["aut"][cod] += v
             c["fav"][fav] += v
             cnpj = so_digitos(x["Código do Favorecido"])
-            if cnpj[:8] in SOCIOS and len(cnpj) == 14:  # verba para empresa ou entidade de político: confere o autor depois
+            if len(cnpj) == 14 and (cnpj[:8] in SOCIOS or cnpj[:8] in ENTIDADES):  # de político: confere o autor depois
                 de_socio.append((cod, cnpj, f"{mes[:4]}-{mes[4:]}-01", fav, v))
             for ini, fim, desc, periodo, cod_san in (punidas.get(cnpj, ()) if len(cnpj) == 14 else ()):
                 if ini < mes <= fim:  # pago depois do mês em que a punição começou
@@ -732,11 +744,13 @@ def montar_emendas(pessoas, saida):
     # verba para empresa ou entidade de político: do próprio autor, ou de outro político que já foi eleito
     chave_de = {c["sq"]: chave for chave, cs in pessoas.items() for c in cs}
     for cod, cnpj, data, fav, v in de_socio:
-        for dono in {chave_de[sq] for sq in SOCIOS[cnpj[:8]] if sq in chave_de}:
-            if dono == autores[cod]["chave"]:
-                pago_a_propria(dono, pessoas[dono], cnpj, data, fav, v, "emenda")
-            elif any(c["sit"] == "Eleito" for c in pessoas[dono]):
-                pago_a_propria(dono, pessoas[dono], cnpj, data, fav, v, f"emenda_de|{autores[cod]['n']}")
+        for indice, destino in ((SOCIOS, PROPRIA), (ENTIDADES, DIRIGIDA)):
+            for dono in {chave_de[sq] for sq in indice.get(cnpj[:8], ()) if sq in chave_de}:
+                if dono == autores[cod]["chave"]:
+                    pago_a_propria(dono, pessoas[dono], cnpj, data, fav, v, "emenda", indice=indice, destino=destino)
+                elif any(c["sit"] == "Eleito" for c in pessoas[dono]):
+                    pago_a_propria(dono, pessoas[dono], cnpj, data, fav, v, f"emenda_de|{autores[cod]['n']}",
+                                   indice=indice, destino=destino)
     lista_alertas = [[fav, cnpj, round(v), f"{mes_br(de)} a {mes_br(ate)}" if de != ate else mes_br(de), desc, periodo,
                       cod, cidade, f"https://portaldatransparencia.gov.br/sancoes/consulta/{cod_san}"]
                      for (cod, cnpj, cod_san, fav, desc, periodo, cidade), (v, de, ate) in alertas.items()]
@@ -847,12 +861,13 @@ def cota_senado(pessoas, punidas, saida, por_sq, topo, mes_br):
     req = urllib.request.Request(SENADO, headers={**UA, "Accept": "application/json"})
     with urllib.request.urlopen(req, timeout=120) as r:
         lista = [x["IdentificacaoParlamentar"] for x in json.load(r)["ListaParlamentarEmExercicio"]["Parlamentares"]["Parlamentar"]]
-    nome_completo = {norm_nome(x["NomeParlamentar"]): (x["UfParlamentar"], norm_nome(x["NomeCompletoParlamentar"])) for x in lista}
+    nome_completo = {norm_nome(x["NomeParlamentar"]): (x.get("UfParlamentar", ""), norm_nome(x["NomeCompletoParlamentar"]))
+                     for x in lista}
     chave_de = {}
     for chave, cs in pessoas.items():
         for c in cs:
             if c["cargo"] in CARGOS_SENADO and c["ano"] in (2018, 2022):
-                chave_de[(c["uf"], norm_nome(c["nome"]))] = chave
+                chave_de[(c["uf"], norm_nome(c["nome"]))] = chave_de[("", norm_nome(c["nome"]))] = chave
     sen = {}
     for ano in ANOS_COTA:
         nome = f"ceaps_{ano}.csv"
@@ -1036,32 +1051,96 @@ def montar_panorama(campanha, empresas):
 ACIMA_DO_NORMAL = 2.0  # só conta "pago a mais" quando passou do dobro da mediana; abaixo disso é variação de modelo
 MINIMO_DE_COMPRAS = 15  # sem pelo menos isso de compras do mesmo produto, não dá para dizer o que é normal
 NOMES_CATEGORIAS = {"parquinho": "Brinquedo de parquinho", "combustivel": "Combustível", "remedio": "Remédio",
-                    "ar": "Ar-condicionado"}
+                    "ar": "Ar-condicionado", "catalogo": "Todo o resto (catálogo do governo)"}
 POR_ESTADO = {"combustivel"}  # combustível muda de preço por estado: o normal é o do estado
+COMPRAS = CACHE / "compras"  # compras.py: tudo do Compras.gov.br, um arquivo por dia
+ESFERA = {"M": "Municipal", "E": "Estadual", "F": "Federal", "D": "Distrital"}
+MINIMO_DE_ORGAOS = 8  # o normal de um produto não pode sair de um órgão só
+ESPALHADO = 2.0  # quem paga caro (p75) pagando mais de 2x quem paga barato (p25): o grupo mistura produtos, fica de fora
+# (produto igual de verdade fica entre 1,1x e 1,7x: medido em ar-condicionado, álcool, carne, cadeira, botijão)
+FAIXA = re.compile(r"superior a|inferior a|acima de", re.I)
+HORTIFRUTI = re.compile(r"\W*(legume|fruta|verdura|hortali|tempero in natura|erva in natura)", re.I)
+TETO_CATALOGO = 5.0  # no catálogo, acima de 5x foi sempre embalagem trocada (preço da caixa com 10 lançado como 1,
+# fardo de água, contrato inteiro como 1 litro): fica de fora. As buscas por palavra (auditadas uma a uma) não têm teto
+REGIAO_UF = {**dict.fromkeys("AC AM AP PA RO RR TO".split(), "no Norte"),
+             **dict.fromkeys("AL BA CE MA PB PE PI RN SE".split(), "no Nordeste"),
+             **dict.fromkeys("DF GO MS MT".split(), "no Centro-Oeste"), **dict.fromkeys("ES MG RJ SP".split(), "no Sudeste"),
+             **dict.fromkeys("PR RS SC".split(), "no Sul")}
+
+
+def dias_de_compras():
+    for a in sorted(COMPRAS.glob("*.json.gz")):
+        yield a.name[:10], json.loads(gzip.decompress(a.read_bytes()))
+
+
+def sem_acento(s):
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()).strip()
+
+
+def linhas_precos(onde):
+    """Cada compra de produto, das duas fontes, no formato
+    [categoria, grupo, produto, descrição, preço, qtd, cidade, UF, órgão, esfera, data, vendedor, CNPJ, prova, CNPJ do órgão,
+    modalidade].
+    1) categorias buscadas por palavra no PNCP (precos.py): pegam também prefeitura que usa outro sistema;
+    2) tudo do Compras.gov.br (compras.py), agrupado pelo código do catálogo do governo + unidade com tamanho. Sem código
+       (o governo parou de preencher em abril/2026), vale a descrição idêntica, que também sai do catálogo."""
+    origem, vistos = RAIZ / "dados" / "precos.json", set()
+    if origem.exists():
+        # o mesmo item pode vir repetido (dois lotes iguais na mesma compra): conta uma vez só
+        for it in {(i[12], i[2], i[3], i[10]): i for i in json.loads(origem.read_text("utf-8"))["itens"]}.values():
+            cat, prod, desc, unit, qtd, mun, uf, orgao, esfera, data, forn, cnpj, url = it
+            vistos.add((url, unit))
+            yield [cat, f"{cat}|{prod}|{uf if cat in POR_ESTADO else ''}", prod, desc, unit, qtd, mun, uf, orgao, esfera,
+                   data, forn, cnpj, url, url.split("/")[-3], ""]
+    for dia, d in dias_de_compras():
+        for cod, un, unit, qtd, pdm, desc, controle, forn, cnpj, data, _ in d["itens"]:
+            orgao_cnpj, (seq, ano) = controle[:14], controle.rsplit("-", 1)[1].split("/")
+            url = f"https://pncp.gov.br/app/editais/{orgao_cnpj}/{ano}/{int(seq)}"
+            # já veio pela busca por palavra; ou é só o nome da família ("Notebook", "Ar condicionado"), sem as
+            # características ("capacidade: 12.000"): aí cabe de R$ 3 mil a R$ 15 mil no mesmo código e não dá para comparar
+            # hortifrúti muda de preço com a safra: o tomate de maio contra a média do ano não diz nada
+            # "memória superior a 8 GB" é uma faixa: o mesmo código junta computador de R$ 4 mil e de R$ 11 mil
+            if (url, unit) in vistos or ":" not in desc or HORTIFRUTI.match(desc) or FAIXA.search(desc):
+                continue
+            mun, uf, esfera, orgao, modalidade = onde.get(controle) or ("", "", "", "", "")
+            prod = pdm.capitalize() if pdm else re.split(r" - |[,:;]", desc)[0][:70]
+            yield ["catalogo", f"catalogo|{'c' + str(cod) if cod else 't' + sem_acento(desc)}|{sem_acento(un)}",
+                   f"{prod} ({un})" if un else prod, desc, unit, qtd, mun, uf, orgao, ESFERA.get(esfera, ""),
+                   data or dia, forn, cnpj, url, orgao_cnpj, modalidade]
 
 
 def montar_precos(cands):
     """Preço normal (mediana) de cada produto e quanto cada compra pagou a mais. O prefeito é o da época:
-    compra até 2024 = eleito em 2020; de 2025 em diante = eleito em 2024."""
-    origem = RAIZ / "dados" / "precos.json"
-    if not origem.exists():
-        return
-    # o mesmo item pode vir repetido (dois lotes iguais na mesma compra): conta uma vez só
-    itens = list({(it[12], it[2], it[3], it[10]): it for it in json.loads(origem.read_text("utf-8"))["itens"]}.values())
-
-    def grupo(it):
-        return f"{it[0]}|{it[1]}|{it[6] if it[0] in POR_ESTADO else ''}"
-    precos = defaultdict(list)
-    for it in itens:
-        precos[grupo(it)].append(it[3])
-    normal = {g: sorted(vs)[len(vs) // 2] for g, vs in precos.items() if len(vs) >= MINIMO_DE_COMPRAS}
+    compra até 2024 = eleito em 2020; de 2025 em diante = eleito em 2024. Lê as compras duas vezes (preço normal,
+    depois o que passou dele) para não guardar milhões de itens na memória."""
+    onde = {}
+    for _, d in dias_de_compras():
+        onde.update(d["compras"])
+    def regional(it):  # catálogo: o normal da região quando ela tem compras bastantes (Roraima paga frete que SP não paga)
+        return f"{it[1]}|{REGIAO_UF.get(it[7], '')}" if it[0] == "catalogo" else None
+    precos, orgaos = defaultdict(list), defaultdict(set)
+    for it in linhas_precos(onde):
+        for g in (it[1], regional(it)):
+            if g:
+                precos[g].append(it[4])
+                orgaos[g].add(it[14])
+    normal = {}
+    for g, vs in precos.items():
+        if len(vs) < MINIMO_DE_COMPRAS:
+            continue
+        vs.sort()
+        if g.startswith("catalogo|") and (len(orgaos[g]) < MINIMO_DE_ORGAOS
+                                         or vs[3 * len(vs) // 4] > ESPALHADO * vs[len(vs) // 4]):
+            continue
+        normal[g] = (vs[len(vs) // 2], len(vs))
+    del precos, orgaos
     prefeito = {}
     for c in cands.values():
         if c["cargo"] == "PREFEITO" and c["sit"] == "Eleito" and c["ano"] in (2020, 2024):
             prefeito[(c["ano"], c["uf"], norm_nome(c["ue"]))] = [c["urna"].title(), c["partido"], c["sq"]]
     marcados, cidades, contagem = [], defaultdict(lambda: [0.0, 0, 0]), defaultdict(int)
-    for it in itens:
-        cat, prod, desc, unit, qtd, mun, uf, orgao, esfera, data, forn, cnpj, url = it
+    for it in linhas_precos(onde):
+        cat, g, prod, desc, unit, qtd, mun, uf, orgao, esfera, data, forn, cnpj, url, _, modalidade = it
         if esfera == "Municipal" and cnpj and cnpj[:8] in SOCIOS:
             # a prefeitura comprou de empresa de quem estava no cargo na cidade (prefeito, vice ou vereador)
             for sq in SOCIOS[cnpj[:8]]:
@@ -1070,13 +1149,17 @@ def montar_precos(cands):
                         and c["uf"] == uf and norm_nome(c["ue"]) == norm_nome(mun)):
                     pago_a_propria(c["cpf"] or "sq" + sq, [c], cnpj, data, forn, unit * (qtd or 1),
                                    f"prefeitura|{mun.title()}/{uf}|{c['cargo'].capitalize()}", url)
-        g = grupo(it)
+        onde_normal = ""
+        if cat == "catalogo":
+            g, onde_normal = (regional(it), REGIAO_UF.get(uf, "")) if regional(it) in normal else (g, "no país")
         if g not in normal or not mun:
             continue
+        preco_normal, amostras = normal[g]
         contagem[cat] += 1
         qtd = qtd or 1
-        vezes = unit / normal[g]
-        a_mais = (unit - normal[g]) * qtd if vezes >= ACIMA_DO_NORMAL else 0.0
+        vezes = unit / preco_normal
+        a_mais = ((unit - preco_normal) * qtd if ACIMA_DO_NORMAL <= vezes <= (TETO_CATALOGO if cat == "catalogo" else 1e9)
+                  else 0.0)
         chave = f"{uf}|{norm_nome(mun)}"
         cidades[chave][2] += 1
         if not a_mais:
@@ -1084,8 +1167,8 @@ def montar_precos(cands):
         cidades[chave][0] += a_mais
         cidades[chave][1] += 1
         pref = prefeito.get((2024 if data >= "2025" else 2020, uf, norm_nome(mun))) if esfera == "Municipal" else None
-        marcados.append([cat, prod, desc[:260], unit, qtd, round(vezes, 1), round(a_mais), normal[g], len(precos[g]),
-                         mun.title(), uf, orgao.title(), data, forn.title(), cnpj, url, pref])
+        marcados.append([cat, prod, desc[:260], unit, qtd, round(vezes, 1), round(a_mais), preco_normal, amostras,
+                         mun.title(), uf, orgao.title(), data, forn.title(), cnpj, url, pref, onde_normal, modalidade])
     marcados.sort(key=lambda m: -m[6])
     dados = {"cats": NOMES_CATEGORIAS, "contagem": contagem, "acima": ACIMA_DO_NORMAL, "itens": marcados,
              "cidades": {k: [round(v[0]), v[1], v[2]] for k, v in cidades.items() if v[0]}}

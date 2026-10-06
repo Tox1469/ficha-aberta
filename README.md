@@ -9,7 +9,7 @@ O site cruza, pelo CPF, todos os candidatos do TSE com as listas oficiais de con
 - a comparação entre partidos pela taxa por mil candidaturas, para não favorecer partido grande nem pequeno;
 - quem está no cargo hoje (eleitos de 2024, de 2022 e senadores de 2018);
 - quanto cada uma das 5.570 prefeituras gastou, por área, comparado com cidades do mesmo tamanho;
-- compras públicas com preço muito acima do normal (parquinho, ar-condicionado, remédio, combustível);
+- compras públicas com preço muito acima do normal: tudo o que passa pelo Compras.gov.br, comparado pelo catálogo oficial de produtos, mais buscas por parquinho, ar-condicionado, remédio e combustível em todo o PNCP;
 - para onde foi a verba que cada deputado e senador mandou (emendas) e o que gastou do mandato (cota);
 - as empresas em que cada político é sócio e o dinheiro público que foi para elas.
 
@@ -26,7 +26,8 @@ Ninguém escreve nada à mão. As mesmas regras valem para todo mundo.
 | CGU, CEIS | condenações por improbidade e outras sanções | CPF |
 | CGU, CEAF | servidores federais expulsos | nome completo + 6 dígitos do meio do CPF (o CPF vem mascarado) |
 | Tesouro Nacional, SICONFI (contas anuais DCA) | gasto da prefeitura por área, receita e royalties | código IBGE + nome da cidade |
-| Portal Nacional de Contratações Públicas (PNCP) | preço unitário de cada item comprado | cidade (prefeito da época) |
+| Portal Nacional de Contratações Públicas (PNCP) | preço unitário de cada item comprado (parquinho, combustível, remédio, ar-condicionado) | cidade (prefeito da época) |
+| Compras.gov.br, dados abertos (contratações da Lei 14.133) | tudo o que foi comprado pelo sistema, item por item, com o código do catálogo de produtos do governo | cidade (prefeito da época) e CNPJ do vendedor |
 | Portal da Transparência, emendas por favorecido | quem recebeu cada pagamento de emenda | nome parlamentar do autor |
 | Câmara e Senado, cota parlamentar | cada nota reembolsada | cadastro do deputado (CPF pela API) e nome completo + UF do senador |
 | TSE, prestação de contas de 2026 | quanto cada campanha recebeu e com quem gastou | pela candidatura |
@@ -43,9 +44,11 @@ Só precisa de Python 3.10+, sem dependências.
 
 ```bash
 python coleta/teste_valores.py # confere o extrator de valores com casos reais
+python coleta/teste_precos.py  # confere o reconhecimento de produto com descrições reais
 python coleta/valores_tcu.py   # lê os acórdãos do TCU (vários GB na primeira vez; depois só o ano corrente)
 python coleta/tcu_total.py     # total que o TCU mandou devolver, de todo mundo
 python coleta/precos.py        # compras no PNCP (incremental)
+python coleta/compras.py       # tudo do Compras.gov.br, um arquivo por dia (a 1ª vez leva umas horas pelo limite da API)
 python coleta/prefeituras.py   # contas das prefeituras no Tesouro (uma vez por mês; demora pelo limite da API)
 python coleta/empresas.py      # quadro de sócios da Receita (uma vez por mês; baixa uns 2 GB)
 python coleta/coletar.py       # baixa o resto, cruza tudo e gera os arquivos do site
@@ -54,7 +57,7 @@ cd site && python -m http.server 8000
 
 Os downloads ficam em `coleta/cache/`. O que é lento de refazer fica em `dados/` no repositório: valores dos acórdãos, compras já lidas, contas das prefeituras e empresas dos políticos (sem CPF: só o número da candidatura).
 
-GitHub Actions: `atualizar.yml` roda todo dia e publica no GitHub Pages; `prefeituras.yml` e `empresas.yml` rodam uma vez por mês.
+GitHub Actions: `atualizar.yml` roda todo dia e publica no GitHub Pages; `prefeituras.yml` e `empresas.yml` rodam uma vez por mês. As compras do Compras.gov.br (`coleta/cache/compras/`, grandes demais para o repositório) ficam no cache do Actions; se ele sumir, o robô baixa de novo aos poucos.
 
 Nenhum CPF sai daqui: todo arquivo gravado passa por `gravar_json`, que apaga qualquer coisa com cara de CPF.
 

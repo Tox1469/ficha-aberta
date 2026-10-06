@@ -339,10 +339,10 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
 
   <section id="aba-parquinhos" hidden>
     <h1 class="titulo">Compras com preço inflado</h1>
-    <p class="nota"><b>Preço inflado é o jeito mais comum de desviar dinheiro em compra pública:</b> a prefeitura paga caro, a empresa embolsa a diferença. Aqui cada compra é comparada com o <b>preço normal do mesmo produto</b>, o preço do meio que os outros órgãos pagaram (dipirona 500 mg com dipirona 500 mg, ar-condicionado de parede de 12 mil BTUs com o mesmo tipo, gangorra de ferro de 3 lugares com gangorra de ferro de 3 lugares, gasolina com gasolina do mesmo estado). Aparece toda compra que pagou o dobro ou mais. Parque montado (com torres, módulos ou brinquedão) e brinquedo adaptado ficam de fora, porque variam demais para ter um preço normal. Combustível lançado como lote inteiro, sem o preço do litro, também fica de fora. Nem todo preço alto é roubo (às vezes o produto é de outra marca ou vem com instalação), por isso cada caso tem a descrição e a prova para conferir. Quando a compra é um registro de preço, a quantidade é o máximo que a prefeitura pode comprar, então o valor pago a mais pode ser menor.</p>
+    <p class="nota"><b>Preço inflado é o jeito mais comum de desviar dinheiro em compra pública:</b> a prefeitura paga caro, a empresa embolsa a diferença. Aqui cada compra é comparada com o <b>preço normal do mesmo produto</b>, o preço do meio que os outros órgãos pagaram (dipirona 500 mg com dipirona 500 mg, ar-condicionado de parede de 12 mil BTUs com o mesmo tipo, gangorra de ferro de 3 lugares com gangorra de ferro de 3 lugares, gasolina com gasolina do mesmo estado). Aparece toda compra que pagou o dobro ou mais. Parque montado (com torres, módulos ou brinquedão) e brinquedo adaptado ficam de fora, porque variam demais para ter um preço normal. Combustível lançado como lote inteiro, sem o preço do litro, também fica de fora. Além dessas buscas, <b>tudo o que passa pelo Compras.gov.br</b> (governo federal, estados e as prefeituras que usam o sistema) é comparado pelo catálogo oficial de produtos do governo: mesmo código de produto e mesma embalagem (caixa com 100 só com caixa com 100). Só vale quando pelo menos 15 compras de 8 órgãos diferentes dizem qual é o preço normal e a maioria paga parecido. O normal é o da região (Norte, Nordeste...) quando ela tem compras bastantes, porque frete pesa. Ficam de fora: produto descrito só pelo nome ("Notebook" pode ser de R$ 3 mil ou de R$ 15 mil), fruta, legume e verdura (mudam de preço com a safra) e compra acima de 5 vezes o normal, que no catálogo é quase sempre a embalagem errada (o preço da caixa com 10 lançado como se fosse de 1). Nem todo preço alto é roubo (às vezes o produto é de outra marca ou vem com instalação), por isso cada caso tem a descrição e a prova para conferir. Quando a compra é um registro de preço, a quantidade é o máximo que a prefeitura pode comprar, então o valor pago a mais pode ser menor.</p>
     <p class="x" id="qresumo">Carregando…</p>
     <form class="filtros pfiltros" id="qfiltros" onsubmit="return false">
-      <label class="f">Buscar cidade<input type="search" name="q" placeholder="Nome da cidade" autocomplete="off"></label>
+      <label class="f">Buscar cidade ou produto<input type="search" name="q" placeholder="Ex.: Recife, dipirona, pneu" autocomplete="off"></label>
       <label class="f">Estado<select name="uf"><option value="">Todos</option></select></label>
       <label class="f">O que foi comprado<select name="cat"><option value="">Tudo</option></select></label>
     </form>
@@ -393,6 +393,10 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
     <p class="x" id="presumo">Carregando…</p>
     <table class="ptab"><thead><tr><th>#</th><th>Político</th><th>Cargo</th><th>Partido</th><th class="r">Valor</th><th>Por onde</th></tr></thead><tbody id="ppropria"></tbody></table>
     <p class="pequena">Cruza o cadastro de sócios e dirigentes da Receita Federal com verbas (emendas), gastos do mandato (cota), o fundo eleitoral de 2026 e compras das prefeituras. Entra a verba que o próprio político mandou para a empresa dele e a verba que outros mandaram para empresa de quem já foi eleito. Só conta pagamento feito quando a pessoa já estava na empresa. Estatais ficam de fora. Clique no nome para ver cada pagamento e a prova.</p>
+    <h3 class="sub3">Verba para associações, fundações e cooperativas dirigidas por políticos</h3>
+    <p class="x" id="dresumo">Carregando…</p>
+    <div id="dlista"></div>
+    <p class="pequena">Aqui não tem dono: o político aparece no cadastro da Receita Federal como presidente, diretor ou conselheiro da entidade. Muitas são hospitais filantrópicos e Santa Casas, e receber verba não prova nada errado. Por isso fica separado das empresas. Só conta verba paga quando a pessoa já dirigia a entidade.</p>
     <h3 class="sub3">Verba paga a empresas e entidades que estavam proibidas de vender para o governo</h3>
     <p class="x" id="eresumo">Carregando…</p>
     <div id="elista"></div>
@@ -857,7 +861,7 @@ async function atualizar() {
     return;
   }
   if (abaAtual === "como") return salvarHash();
-  if (abaAtual === "emendas") return desenharEmpresasPropria(), desenharEmendas();
+  if (abaAtual === "emendas") return desenharEmpresasPropria(), desenharEntidades(), desenharEmendas();
   if (abaAtual === "parquinhos") return desenharParquinhos();
   if ($("#ordem").value === "camp") {
     if (form.ano.value !== "2026") form.ano.value = "2026";
@@ -1288,6 +1292,25 @@ document.addEventListener("click", ev => {
   EMPL.then(l => { const linha = l.lista[+a.dataset.fichaPropria][0]; if (!porId.has(linha[0])) pessoaDeLinha(linha); abrirFicha(linha[0]); });
 });
 
+let ENTL = null;
+const carregarEntidades = () => (ENTL ??= fetch("empresas/entidades.json").then(r => r.ok ? r.json() : null).catch(() => null));
+
+async function desenharEntidades() {
+  const l = await carregarEntidades();
+  if (!l) { $("#dresumo").textContent = "Ainda sem os dados da Receita."; return; }
+  const total = l.lista.reduce((t, x) => t + x[1], 0);
+  $("#dresumo").innerHTML = `<b>${curto(total)}</b> de verba foi para associações, fundações e cooperativas dirigidas por <b>${fmt(l.lista.length)}</b> políticos.`;
+  $("#dlista").innerHTML = l.lista.slice(0, 100).map(([linha, , pags]) => {
+    const [, urna, , cargo, uf, ue, , partido, sit, , ano] = linha;
+    return pags.map(([onde, ent, cnpj, v, de, ate, papel]) => {
+      const [tipo, autor] = onde.split("|"), quando = mesBr(de) === mesBr(ate) ? mesBr(de) : `${mesBr(de)} a ${mesBr(ate)}`;
+      return `<div class="caso"><div class="t"><b>${esc(titulo(ent))}</b><span class="chip">${esc(papel || "Dirigente")}: ${esc(titulo(urna))}</span></div>
+        <div class="x">Recebeu <b>${reais(v)}</b> de verba ${tipo === "emenda" ? `mandada pelo próprio ${esc(titulo(urna))}` : `mandada por <b>${esc(titulo(autor || ""))}</b>`} (${quando}). Última candidatura de ${esc(titulo(urna))} (${esc(partido)}): ${esc(nomeCargo(cargo).toLowerCase())} em ${esc(local([ano, cargo, uf, ue]))}, ${ano}, ${esc(sit.toLowerCase())}.</div>
+        <div class="lk"><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: o que a entidade recebeu do governo</a><a href="${RECEITA}" target="_blank" rel="noopener">Prova: quadro de dirigentes (Receita Federal)</a></div></div>`;
+    }).join("");
+  }).join("");
+}
+
 function blocoEmendasAutor(e, cod) {
   const a = e.autores[cod];
   const als = e.alertas.filter(x => x[6] === cod);
@@ -1349,18 +1372,18 @@ async function desenharParquinhos() {
     if (h.get("qq")) qform.q.value = h.get("qq");
   }
   const f = Object.fromEntries(new FormData(qform)), q = norm(f.q || "").trim();
-  const lista = d.itens.filter(i => (!f.cat || i[0] === f.cat) && (!f.uf || i[10] === f.uf) && (!q || norm(i[9]).includes(q)));
+  const lista = d.itens.filter(i => (!f.cat || i[0] === f.cat) && (!f.uf || i[10] === f.uf) && (!q || norm(i[9] + " " + i[1]).includes(q)));
   const soma = lista.reduce((t, i) => t + i[6], 0);
   const total = f.cat ? d.contagem[f.cat] : Object.values(d.contagem).reduce((a, b) => a + b, 0);
   $("#qresumo").innerHTML = `De ${fmt(total)} compras comparadas, <b>${fmt(lista.length)}</b>${f.uf || q ? " (com esses filtros)" : ""} custaram mais que o dobro do normal. Somando, <b>${curto(soma)}</b> pagos a mais.`;
   $("#qlista").innerHTML = lista.slice(0, qmostrando).map(i => {
-    const [cat, prod, desc, unit, qtd, vz, mais, normal, amostras, mun, uf, orgao, data, forn, cnpj, url, pref] = i;
+    const [cat, prod, desc, unit, qtd, vz, mais, normal, amostras, mun, uf, orgao, data, forn, cnpj, url, pref, ondeNormal, modalidade] = i;
     const fichaPref = pref && porId.has(pref[2]) ? `<a href="#" data-ficha-emenda="${esc(pref[2])}">Ficha do prefeito</a>` : "";
     const centavos = unit < 100;
     return `<div class="caso alerta">
       <div class="t"><b>${esc(mun)}/${esc(uf)}</b><span class="chip s-final">${vz.toLocaleString("pt-BR")} vezes o normal</span></div>
-      <div class="x"><b>${esc(prod)}</b> por <b>${reais(unit, centavos)}</b> cada${qtd > 1 ? ` (${fmt(Math.round(qtd))} unidades)` : ""}. O normal é <b>${reais(normal, centavos)}</b>, o preço do meio de ${fmt(amostras)} compras${cat === "combustivel" ? ` em ${esc(UFS[uf] || uf)}` : ""}. Pago a mais: <b>${reais(mais)}</b>.</div>
-      <div class="meta">Comprado por ${esc(orgao)} em ${esc(data.split("-").reverse().join("/"))}${forn ? ", de " + esc(forn) : ""}${pref ? `. Prefeito na época: ${esc(pref[0])} (${esc(pref[1])})` : ""}.</div>
+      <div class="x"><b>${esc(prod)}</b> por <b>${reais(unit, centavos)}</b> cada${qtd > 1 ? ` (${fmt(Math.round(qtd))} unidades)` : ""}. O normal é <b>${reais(normal, centavos)}</b>, o preço do meio de ${fmt(amostras)} compras${cat === "combustivel" ? ` em ${esc(UFS[uf] || uf)}` : ondeNormal ? " " + esc(ondeNormal) : ""}. Pago a mais: <b>${reais(mais)}</b>.</div>
+      <div class="meta">${modalidade === "Dispensa" || modalidade === "Inexigibilidade" ? `Compra sem licitação (${modalidade.toLowerCase()}). ` : ""}Comprado por ${esc(orgao)} em ${esc(data.split("-").reverse().join("/"))}${forn ? ", de " + esc(forn) : ""}${pref ? `. Prefeito na época: ${esc(pref[0])} (${esc(pref[1])})` : ""}.</div>
       <details><summary>Ler a descrição do produto</summary><p>${esc(desc)}</p></details>
       <div class="lk"><a href="${esc(url)}" target="_blank" rel="noopener">Prova: a compra no portal de compras do governo</a>${cnpj ? `<a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: o que a empresa recebe do governo</a>` : ""}${fichaPref}</div>
     </div>`;

@@ -24,6 +24,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      # tudo do Compras.gov.br (um arquivo por dia, uns 100 MB) mora no cache do Actions, não no repositório;
+      # se o cache sumir, o compras.py baixa de novo aos poucos
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: coleta/cache/compras
+          key: compras-${{ github.run_id }}
+          restore-keys: compras-
+
       - name: Testar o leitor das decisões do TCU e o reconhecimento de produto
         run: |
           python coleta/teste_valores.py
@@ -37,6 +45,10 @@ jobs:
       - name: Compras novas no portal do governo (preço pago a mais)
         run: python coleta/precos.py
         continue-on-error: true # se o portal cair, o resto do site atualiza mesmo assim
+
+      - name: Tudo o que foi comprado pelo Compras.gov.br (catálogo de produtos do governo)
+        run: python coleta/compras.py
+        continue-on-error: true
 
       - name: Cruzar tudo (TSE, TCU, CGU, Câmara, Senado, Tesouro, Banco Central)
         run: python coleta/coletar.py
