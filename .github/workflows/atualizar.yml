@@ -24,8 +24,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Testar o leitor das decisões do TCU
-        run: python coleta/teste_valores.py
+      - name: Testar o leitor das decisões do TCU e o reconhecimento de produto
+        run: |
+          python coleta/teste_valores.py
+          python coleta/teste_precos.py
 
       - name: Decisões novas do TCU (valor de cada candidato e total do país)
         run: |

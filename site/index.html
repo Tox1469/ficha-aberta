@@ -339,7 +339,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
 
   <section id="aba-parquinhos" hidden>
     <h1 class="titulo">Compras com preço inflado</h1>
-    <p class="nota"><b>Preço inflado é o jeito mais comum de desviar dinheiro em compra pública:</b> a prefeitura paga caro, a empresa embolsa a diferença. Aqui cada compra é comparada com o <b>preço normal do mesmo produto</b>, o preço do meio que os outros órgãos pagaram (dipirona 500 mg com dipirona 500 mg, ar-condicionado de parede de 12 mil BTUs com o mesmo tipo, gangorra de ferro de 3 lugares com gangorra de ferro de 3 lugares, gasolina com gasolina do mesmo estado). Aparece toda compra que pagou o dobro ou mais. Parque montado (com torres e módulos) e brinquedo adaptado ficam de fora, porque variam demais para ter um preço normal. Nem todo preço alto é roubo (às vezes o produto é de outra marca ou vem com instalação), por isso cada caso tem a descrição e a prova para conferir. Quando a compra é um registro de preço, a quantidade é o máximo que a prefeitura pode comprar, então o valor pago a mais pode ser menor.</p>
+    <p class="nota"><b>Preço inflado é o jeito mais comum de desviar dinheiro em compra pública:</b> a prefeitura paga caro, a empresa embolsa a diferença. Aqui cada compra é comparada com o <b>preço normal do mesmo produto</b>, o preço do meio que os outros órgãos pagaram (dipirona 500 mg com dipirona 500 mg, ar-condicionado de parede de 12 mil BTUs com o mesmo tipo, gangorra de ferro de 3 lugares com gangorra de ferro de 3 lugares, gasolina com gasolina do mesmo estado). Aparece toda compra que pagou o dobro ou mais. Parque montado (com torres, módulos ou brinquedão) e brinquedo adaptado ficam de fora, porque variam demais para ter um preço normal. Combustível lançado como lote inteiro, sem o preço do litro, também fica de fora. Nem todo preço alto é roubo (às vezes o produto é de outra marca ou vem com instalação), por isso cada caso tem a descrição e a prova para conferir. Quando a compra é um registro de preço, a quantidade é o máximo que a prefeitura pode comprar, então o valor pago a mais pode ser menor.</p>
     <p class="x" id="qresumo">Carregando…</p>
     <form class="filtros pfiltros" id="qfiltros" onsubmit="return false">
       <label class="f">Buscar cidade<input type="search" name="q" placeholder="Nome da cidade" autocomplete="off"></label>
@@ -448,7 +448,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
       <li><b>Pago a quem estava proibido de contratar:</b> o site cruza quem recebeu emenda ou cota com o cadastro de punidos da CGU (CEIS). Só conta a declaração de inidoneidade (vale para qualquer governo) e o impedimento ou a suspensão dados por órgão federal, e só se o pagamento foi depois do mês em que a punição começou. O pagamento pode ser de contrato assinado antes da punição, que a lei permite manter.</li>
       <li><b>Bens:</b> o que cada candidato declarou ao TSE em cada eleição, pelo valor que ele mesmo digitou. Tem erro de digitação na base do TSE.</li>
       <li><b>Empresas dos políticos:</b> vêm do cadastro de sócios que a Receita Federal publica todo mês. A Receita mostra o nome do sócio e só os 6 números do meio do CPF; o site liga ao candidato quando o nome completo e esses 6 números batem. O CPF serve só para essa ligação e não aparece no site.</li>
-      <li><b>Dinheiro público para empresa de político:</b> nota da cota do mandato, verba (emenda) mandada pelo próprio parlamentar, gasto da campanha de 2026 pago com fundo eleitoral ou partidário, ou compra da prefeitura onde a pessoa era prefeito, vice ou vereador, pago a empresa da qual ela já era sócia ou dirigente na data. Também entra a verba mandada por outros políticos para empresa ou entidade de quem já foi eleito. Estatais (como Infraero e Dataprev) ficam de fora: diretor de estatal não é dono. A Receita só mostra o quadro atual, então quem já saiu da empresa fica de fora. As compras de prefeitura são só as que o site já lê do Portal Nacional de Contratações (as mesmas da aba Preço inflado). Receber verba não prova nada errado: a ficha mostra o pagamento e a prova para cada um conferir.</li>
+      <li><b>Dinheiro público para empresa de político:</b> nota da cota do mandato, verba (emenda) mandada pelo próprio parlamentar, gasto da campanha de 2026 pago com fundo eleitoral ou partidário, ou compra da prefeitura onde a pessoa era prefeito, vice ou vereador, pago a empresa da qual ela já era sócia ou dirigente na data. Também entra a verba mandada por outros políticos para empresa de quem já foi eleito. Só conta empresa privada, que tem dono: estatal (como Infraero e Dataprev), cooperativa, associação, fundação e hospital filantrópico (Santa Casa) ficam de fora, porque presidente ou diretor dessas entidades não fica com o dinheiro que elas recebem. A Receita só mostra o quadro atual, então quem já saiu da empresa fica de fora. As compras de prefeitura são só as que o site já lê do Portal Nacional de Contratações (as mesmas da aba Preço inflado). Receber verba não prova nada errado: a ficha mostra o pagamento e a prova para cada um conferir.</li>
     </ul>
 
     <h2>Prefeituras</h2>
@@ -1082,7 +1082,7 @@ fetch("panorama.json").then(r => r.ok ? r.json() : null).then(d => {
   if (d.tcu) linhas.push(`<li><b>${curto(d.tcu.total)}</b> de dinheiro federal sumiu na mão de quem cuidava dele, segundo condenações do Tribunal de Contas da União (TCU) desde ${Object.keys(d.tcu.ano)[0]}: desviado ou gasto sem provar onde (valor da época, sem correção).</li>`);
   if (d.leniencia) linhas.push(`<li><b>${curto(d.leniencia.total)}</b> ${d.leniencia.n} empresas, como ${[...new Set(d.leniencia.maiores.map(a => a[0]))].slice(0, 4).map(esc).join(", ")}, admitiram corrupção e aceitaram pagar de volta.</li>`);
   if (d.campanha) linhas.push(`<li><b>${curto(d.campanha.fefc + d.campanha.fp)}</b> de dinheiro público pagou as campanhas de ${d.campanha.ano} (fundo eleitoral e partidário).</li>`);
-  if (d.empresas && d.empresas.total) linhas.push(`<li><b>${curto(d.empresas.total)}</b> de dinheiro público foi parar em empresas e entidades de ${fmt(d.empresas.pessoas)} políticos. <a href="#aba=emendas" data-ir-aba="emendas">Ver quem</a></li>`);
+  if (d.empresas && d.empresas.total) linhas.push(`<li><b>${curto(d.empresas.total)}</b> de dinheiro público foi parar em empresas de ${fmt(d.empresas.pessoas)} políticos. <a href="#aba=emendas" data-ir-aba="emendas">Ver quem</a></li>`);
   if (d.emendas) linhas.push(`<li><b>${curto(d.emendas.total)}</b> deputados e senadores mandaram para cidades, entidades e empresas desde 2019. ${curto(d.emendas.pix)} disso caiu no caixa das prefeituras sem dizer em que vai ser gasto ("verba Pix").</li>`);
   $("#panorama").innerHTML = `<h2>Quanto dinheiro</h2><ul>${linhas.join("")}</ul><p class="pequena">De onde vem: decisões do TCU, acordos fechados pela Controladoria-Geral da União (CGU), contas de campanha entregues ao TSE e Portal da Transparência do governo. Veja as contas em Como funciona.</p>`;
   $("#panorama").hidden = false;
@@ -1249,8 +1249,8 @@ function pagamentoPropria([onde, forn, cnpj, v, de, ate, prova]) {
   const [tipo, extra, cargo] = onde.split("|"), quando = mesBr(de) === mesBr(ate) ? mesBr(de) : `${mesBr(de)} a ${mesBr(ate)}`;
   const texto = {
     cota: `A cota do mandato pagou <b>${reais(v)}</b> a esta empresa (${quando}).`,
-    emenda: `Mandou <b>${reais(v)}</b> de verba do governo (emenda) para esta empresa ou entidade (${quando}).`,
-    emenda_de: `Esta empresa ou entidade recebeu <b>${reais(v)}</b> de verba do governo (emenda) mandada por <b>${esc(titulo(extra || ""))}</b> (${quando}).`,
+    emenda: `Mandou <b>${reais(v)}</b> de verba do governo (emenda) para esta empresa (${quando}).`,
+    emenda_de: `Esta empresa recebeu <b>${reais(v)}</b> de verba do governo (emenda) mandada por <b>${esc(titulo(extra || ""))}</b> (${quando}).`,
     campanha: `A campanha pagou <b>${reais(v)}</b> a esta empresa com fundo eleitoral ou partidário, que é dinheiro público (${quando}).`,
     prefeitura: `A prefeitura de ${esc(extra)} comprou <b>${reais(v)}</b> desta empresa (${quando}), quando ocupava o cargo de ${esc((cargo || "").toLowerCase())} na cidade.`,
   }[tipo];
@@ -1263,17 +1263,17 @@ function blocoEmpresas(d, mes) {
   const emp = ([cnpj, nome, papel, desde]) => `<div><b>${esc(nome || "Empresa sem nome no arquivo")}</b><span>${esc(papel)}${desde ? " desde " + dataBr(desde) : ""}</span><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: a empresa no governo</a></div>`;
   return `${d.p.length ? `<h3>Dinheiro público que foi para empresas da pessoa (${reais(d.p.reduce((t, p) => t + p[3], 0))})</h3>${d.p.slice(0, 10).map(pagamentoPropria).join("")}
     ${d.p.length > 10 ? `<details><summary>Ver os outros ${d.p.length - 10} pagamentos</summary>${d.p.slice(10).map(pagamentoPropria).join("")}</details>` : ""}` : ""}
-    <h3>Empresas em que é sócio(a) (${d.e.length})</h3>
+    <h3>Empresas e entidades em que aparece como sócio(a) ou dirigente (${d.e.length})</h3>
     <div class="cands">${d.e.slice(0, 20).map(emp).join("")}</div>
     ${d.e.length > 20 ? `<details><summary>Ver as outras ${d.e.length - 20}</summary><div class="cands">${d.e.slice(20).map(emp).join("")}</div></details>` : ""}
-    <p class="pequena">Do cadastro de sócios da Receita Federal${mes ? ` (${mesBr(mes + "-01")})` : ""}. A ligação exige o nome completo igual e os 6 números do meio do CPF que a Receita divulga, então homônimo não entra. A Receita mostra só os sócios de hoje: quem saiu da empresa não aparece. Ser sócio de empresa não é crime.</p>`;
+    <p class="pequena">Do cadastro de sócios da Receita Federal${mes ? ` (${mesBr(mes + "-01")})` : ""}. A ligação exige o nome completo igual e os 6 números do meio do CPF que a Receita divulga, então homônimo não entra. A Receita mostra só os sócios de hoje: quem saiu da empresa não aparece. Ser sócio de empresa ou dirigir entidade não é crime.</p>`;
 }
 
 async function desenharEmpresasPropria() {
   const l = await carregarListaEmpresas();
   if (!l) { $("#presumo").textContent = "Ainda sem os dados da Receita."; return; }
   const total = l.lista.reduce((t, x) => t + x[1], 0);
-  $("#presumo").innerHTML = `<b>${curto(total)}</b> de dinheiro público foi para empresas e entidades de <b>${fmt(l.lista.length)}</b> políticos, quando eles já apareciam como sócios ou dirigentes delas.`;
+  $("#presumo").innerHTML = `<b>${curto(total)}</b> de dinheiro público foi para empresas de <b>${fmt(l.lista.length)}</b> políticos, quando eles já apareciam como sócios ou dirigentes delas.`;
   $("#ppropria").innerHTML = l.lista.slice(0, 200).map(([linha, v, ondes], i) => {
     const [sq, urna, , cargo, uf, ue, , partido, , , ano] = linha;
     return `<tr><td class="num">${i + 1}</td><td><a href="#" data-ficha-propria="${i}">${esc(titulo(urna))}</a></td><td>${esc(nomeCargo(cargo))}, ${esc(local([ano, cargo, uf, ue]))} (${ano})</td><td>${esc(partido)}</td><td class="r num">${curto(v)}</td><td>${ondes.map(o => ONDE[o]).join(", ")}</td></tr>`;

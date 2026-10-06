@@ -32,14 +32,18 @@ def parquinho(desc, un):
     adaptado para cadeirante variam demais de tamanho e de preço: não dá para dizer qual é o normal, então fica de fora."""
     d = sem_acento(desc)
     if re.search(r"natal|ilumina|\bled\b|inflav|miniatura|pedagog|de mesa|boneco|fantasia", d) or \
-            re.search(r"^\W*(servico|manuten|reforma|pintura|locacao|aluguel|instala|projeto|recupera)", d) or \
+            re.search(r"^\W*(servico|prestacao|manuten|reforma|pintura|locacao|aluguel|instala|projeto|recupera|praca)", d) or \
             re.search(r"torre|modular|modulo|multi|conjunto|playground|parque infantil|parquinho|\bkit\b|composto por"
                       r"|acessib|cadeira de rodas|cadeirante|\bpcd\b|deficien|inclus|adaptad"
-                      r"|tematic|fibra de vidro|tarzan|escalada|combo|casinha|casa d|alimentacao|pikler|bebe", d):
+                      r"|tematic|fibra de vidro|tarzan|escalada|combo|casinha|casa d|alimentacao|pikler|bebe"
+                      r"|play|brink|\bponte\b|tunel|obstacul|\bmola\b|\brede\b"
+                      r"|misturador|homogeneiz|agitador|laborat|batedeira", d):
         return None
+    # o brinquedo tem que ser o próprio item, logo no começo ("Brinquedo em geral material: aço, tipo: gangorra" cabe):
+    # quando o nome aparece lá no meio, é peça de um brinquedão ou outra coisa
     for nome, rx in (("Gangorra", r"\bgangorra"), ("Escorregador", r"escorregador|tobog"),
                      ("Gira-gira", r"gira[- ]?gira|carrossel"), ("Balanço", r"\bbalanco\b")):
-        if re.search(rx, d):
+        if re.search(rx, d[:60]):
             break
     else:
         return None
@@ -64,6 +68,13 @@ def combustivel(desc, un):
     if not re.search(r"^l\b|^lt|litro", u) and not re.search(r"\blitro", d):
         return None  # só preço por litro
     if re.search(r"lubrific|arla|aditivo para|graxa|oleo (de )?motor|2 tempos|hidraulic", d):
+        return None
+    # o combustível tem que ser o próprio item: "veículo bicombustível (álcool e gasolina)" é carro e
+    # "gerador a gasolina" é máquina, não litro
+    m = re.search(r"gasolina|diesel|etanol|alcool", d[:60])
+    if not m or re.search(r"veicul|automov|motocic|\bmoto\b|caminh|onibus|ambulan|pick|\bsuv\b|sedan|hatch|minivan|furg"
+                          r"|trator|carro|pulveriz|bomba|gerador|rocad|motosserra|soprador|cortador|aditivo|\d+w\d*",
+                          d[:m.start()]):
         return None
     for nome, rx in (("Gasolina aditivada", r"gasolina\s+aditivada"), ("Gasolina comum", r"gasolina"),
                      ("Diesel S10", r"diesel\W*s\W*10\b"), ("Diesel S500", r"diesel\W*s\W*500"),
@@ -119,7 +130,9 @@ CATEGORIAS = {
     "parquinho": {"nome": "Brinquedo de parquinho", "agrupa": parquinho, "desde": 2021, "por_uf": False,
                   "buscas": ["parque infantil", "playground", "parquinho", "gangorra", "escorregador", "balanço infantil"]},
     "combustivel": {"nome": "Combustível (litro)", "agrupa": combustivel, "desde": 2025, "por_uf": True,
-                    "buscas": ["gasolina", "óleo diesel", "etanol combustível"], "max_paginas": 25},
+                    "buscas": ["gasolina", "óleo diesel", "etanol combustível"], "max_paginas": 25,
+                    # nenhum litro custa mais de R$ 50: acima disso é o valor do lote inteiro lançado como se fosse o litro
+                    "faixa": (2, 50)},
     "remedio": {"nome": "Remédio", "agrupa": remedio, "desde": 2025, "por_uf": False,
                 "buscas": ["medicamentos", "aquisição de medicamentos"], "max_paginas": 25},
     "ar": {"nome": "Ar-condicionado", "agrupa": ar_condicionado, "desde": 2024, "por_uf": False,
@@ -185,7 +198,8 @@ def itens_da_compra(cat, chave, info):
                 continue
             for r in pegar(f"{base}/{it['numeroItem']}/resultados") or []:
                 unit, qtd = r.get("valorUnitarioHomologado"), r.get("quantidadeHomologada") or it.get("quantidade")
-                if not unit or unit <= 0 or r.get("situacaoCompraItemResultadoId") not in (1, None):
+                lo, hi = CATEGORIAS[cat].get("faixa", (0, float("inf")))
+                if not unit or not lo < unit < hi or r.get("situacaoCompraItemResultadoId") not in (1, None):
                     continue
                 out.append([cat, grupo, (it.get("descricao") or "").strip()[:300], round(unit, 4), qtd,
                             info["mun"], info["uf"], info["orgao"], info["esfera"], info["data"],

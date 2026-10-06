@@ -574,16 +574,18 @@ SOCIOS = {}  # começo do CNPJ (8 dígitos, vale para matriz e filiais) -> {núm
 PROPRIA = defaultdict(lambda: defaultdict(lambda: [0.0, "9999-99-99", "0000-00-00", ""]))
 
 
-def estatal(natureza):
-    """Órgão público, empresa pública ou de economia mista: diretor de estatal não é dono, fica de fora do cruzamento."""
-    return natureza[:1] == "1" or natureza in ("2011", "2038")
+def tem_dono(natureza):
+    """Só empresa privada entra no cruzamento do dinheiro (natureza jurídica 2xxx). Ficam de fora o que não tem dono:
+    órgão público (1xxx), estatal (2011, 2038), cooperativa (2143) e associação, fundação, Santa Casa (3xxx).
+    Presidente de hospital filantrópico não embolsa a verba que o hospital recebe."""
+    return natureza[:1] == "2" and natureza not in ("2011", "2038", "2143")
 
 
 def carregar_socios():
     if EMPRESAS_POLITICOS.exists():
         for sqs, empresas in json.loads(gzip.decompress(EMPRESAS_POLITICOS.read_bytes()))["pessoas"]:
             for cnpj, _, _, desde, natureza in empresas:
-                if not estatal(natureza):
+                if tem_dono(natureza):
                     SOCIOS.setdefault(cnpj[:8], {}).update((sq, desde or "9999") for sq in sqs)
 
 
