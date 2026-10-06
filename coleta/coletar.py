@@ -35,7 +35,7 @@ csv.field_size_limit(10**8)
 
 # ---------- utilidades ----------
 
-def baixar(url, nome, corpo=None):
+def baixar(url, nome, corpo=None, cabecalho=None):
     """Baixa para o cache. Servidor do governo derruba conexão no meio sem dar erro (o CSV do TCU vinha com 16 MB
     de 360): confere o Content-Length e continua de onde parou com Range."""
     destino = CACHE / nome
@@ -43,7 +43,7 @@ def baixar(url, nome, corpo=None):
         return destino
     destino.parent.mkdir(parents=True, exist_ok=True)
     print("baixando", url, file=sys.stderr)
-    cab = dict(UA, **({"Content-Type": "application/json"} if corpo else {}))
+    cab = dict(UA, **({"Content-Type": "application/json"} if corpo else {}), **(cabecalho or {}))
     tmp = destino.with_suffix(".parcial")
     tmp.unlink(missing_ok=True)
     total = None
@@ -97,8 +97,12 @@ def esconder_cpf(texto):
 def gravar_json(caminho, dados, indent=None):
     """Todo arquivo que vai para o site ou para o repositório passa por aqui: qualquer coisa com cara de CPF sai,
     venha do nome de um fornecedor, de um trecho de decisão ou de onde for."""
-    texto = json.dumps(dados, ensure_ascii=False, indent=indent, separators=None if indent is not None else (",", ":"))
-    caminho.write_text(esconder_cpf(texto), "utf-8", newline="\n")
+    texto = esconder_cpf(json.dumps(dados, ensure_ascii=False, indent=indent,
+                                    separators=None if indent is not None else (",", ":")))
+    if caminho.suffix == ".gz":  # mtime=0: mesmo conteúdo, mesmo arquivo (o git não vê mudança à toa)
+        caminho.write_bytes(gzip.compress(texto.encode(), mtime=0))
+    else:
+        caminho.write_text(texto, "utf-8", newline="\n")
 
 
 def so_digitos(s):
@@ -182,6 +186,12 @@ def marcar_no_cargo(pessoas):
                 c["nc"] = c["ano"] == 2022 and bool(c["cpf"]) and c["cpf"] in camara
             else:
                 c["nc"] = c["sit"] == "Eleito" and (c["ano"] == 2024 or c["ano"] == 2022)
+
+
+def linha_todos(c, verificavel):
+    """Candidatura no formato das listas completas do site (todos/*.json)."""
+    return [c["sq"], c["urna"], c["nome"], c["cargo"], c["uf"], c["ue"], c["sg_ue"], c["partido"], c["sit"],
+            int(verificavel), c["ano"], int(no_cargo(c)), c["bens"], c.get("bens_ant")]
 
 
 def no_cargo(c):
@@ -353,7 +363,7 @@ def casos_tcu():
             c.pop("_acs", None)
             # o título diz o que aconteceu, em português simples
             if c.get("deb"):
-                c["t"] = "Condenado pelo TCU a devolver dinheiro público"
+                c["t"] = "Dinheiro público sumiu: condenado pelo TCU a pagar de volta"
             elif c.get("mul") and c["t"] == "Contas reprovadas pelo TCU":
                 c["t"] = "Multado pelo TCU por contas reprovadas"
     return casos
@@ -495,8 +505,7 @@ def montar():
         if not casos:
             for c in cs:  # entra na lista completa da eleição, carregada sob demanda pelo site
                 arquivo = str(c["ano"]) if c["ano"] in ANOS_GERAIS else f"{c['ano']}-{c['uf']}"
-                linha = [c["sq"], c["urna"], c["nome"], c["cargo"], c["uf"], c["ue"],
-                         c["sg_ue"], c["partido"], c["sit"], int(verificavel), c["ano"], int(no_cargo(c)), c["bens"], c["bens_ant"]]
+                linha = linha_todos(c, verificavel)
                 sem_registro[arquivo].append(linha)
                 if no_cargo(c):
                     sem_registro["no-cargo"].append(linha)
@@ -545,14 +554,83 @@ def montar():
         gravar_json(pasta / f"{arquivo}.json", linhas)
     print(f"{sum(map(len, sem_registro.values()))} candidaturas sem registro em {len(sem_registro)} arquivos",
           file=sys.stderr)
+    carregar_socios()
     montar_prefeituras(cands, saida)
     montar_precos(cands)
     montar_emendas(pessoas, saida)
     montar_cota(pessoas)
-    montar_panorama(montar_campanha())
+    campanha = montar_campanha(pessoas)
+    montar_panorama(campanha, montar_empresas(pessoas))
     print(f"{len(saida)} pessoas com registro, {sum(len(p['k']) for p in saida)} casos, "
           f"{SAIDA.stat().st_size / 1e6:.1f} MB "
           f"({len(gzip.compress(SAIDA.read_bytes())) / 1e6:.1f} MB gzip)", file=sys.stderr)
+
+
+# ---------- empresas em que o próprio político é sócio (Receita Federal, lidas pelo empresas.py) ----------
+
+EMPRESAS_POLITICOS = RAIZ / "dados" / "empresas_politicos.json.gz"
+SOCIOS = {}  # começo do CNPJ (8 dígitos, vale para matriz e filiais) -> {número da candidatura: sócio desde AAAA-MM-DD}
+# pessoa -> (onde, fornecedor, cnpj) -> [valor, primeira data, última data, prova]
+PROPRIA = defaultdict(lambda: defaultdict(lambda: [0.0, "9999-99-99", "0000-00-00", ""]))
+
+
+def estatal(natureza):
+    """Órgão público, empresa pública ou de economia mista: diretor de estatal não é dono, fica de fora do cruzamento."""
+    return natureza[:1] == "1" or natureza in ("2011", "2038")
+
+
+def carregar_socios():
+    if EMPRESAS_POLITICOS.exists():
+        for sqs, empresas in json.loads(gzip.decompress(EMPRESAS_POLITICOS.read_bytes()))["pessoas"]:
+            for cnpj, _, _, desde, natureza in empresas:
+                if not estatal(natureza):
+                    SOCIOS.setdefault(cnpj[:8], {}).update((sq, desde or "9999") for sq in sqs)
+
+
+def pago_a_propria(chave, cs, cnpj, data, fornecedor, valor, onde, prova=""):
+    """Anota dinheiro público pago a empresa em que o próprio político JÁ era sócio na data do pagamento.
+    A Receita só mostra o quadro de sócios de hoje: quem saiu antes não aparece (fica de fora, não acusa à toa)."""
+    desde = SOCIOS.get(cnpj[:8]) if len(cnpj) == 14 and data else None
+    if desde and any(desde.get(c["sq"], "9999") <= data for c in cs):
+        p = PROPRIA[chave][(onde, fornecedor, cnpj)]
+        p[0] += valor
+        p[1], p[2] = min(p[1], data), max(p[2], data)
+        p[3] = p[3] or prova
+        return p
+
+
+def montar_empresas(pessoas):
+    """Empresas de cada político e o dinheiro público que foi para elas. Em pedaços (pelos 2 últimos dígitos do número
+    da candidatura) para o site baixar só o da ficha aberta; mais a lista de quem pagou a própria empresa."""
+    if not EMPRESAS_POLITICOS.exists():
+        return None
+    dados = json.loads(gzip.decompress(EMPRESAS_POLITICOS.read_bytes()))
+    chave_de = {c["sq"]: chave for chave, cs in pessoas.items() for c in cs}
+    pedacos, lista = defaultdict(dict), []
+    for sqs, empresas in dados["pessoas"]:
+        chave = chave_de.get(sqs[0])
+        if not chave:
+            continue
+        pag = sorted(([onde, forn.title(), cnpj, round(v), de, ate, prova]
+                      for (onde, forn, cnpj), (v, de, ate, prova) in PROPRIA[chave].items()), key=lambda p: -p[3])
+        item = {"e": [e[:4] for e in empresas], "p": pag}
+        for sq in sqs:
+            pedacos[sq[-2:]][sq] = item
+        if pag:
+            c = max(pessoas[chave], key=lambda c: c["ano"])
+            lista.append([linha_todos(c, not chave.startswith("sq")), sum(p[3] for p in pag),
+                          sorted({p[0].split("|")[0] for p in pag})])
+    pasta = SAIDA.parent / "empresas"
+    shutil.rmtree(pasta, ignore_errors=True)
+    pasta.mkdir()
+    for pedaco, d in pedacos.items():
+        gravar_json(pasta / f"{pedaco}.json", d)
+    lista.sort(key=lambda x: -x[1])
+    gravar_json(pasta / "lista.json", {"mes": dados["mes"], "lista": lista})
+    total = sum(x[1] for x in lista)
+    print(f"empresas: {len(dados['pessoas'])} políticos sócios; R$ {total / 1e6:.1f} mi de dinheiro público "
+          f"para empresas de {len(lista)} deles", file=sys.stderr)
+    return {"total": total, "pessoas": len(lista), "mes": dados["mes"]}
 
 
 # ---------- emendas parlamentares: quem mandou, para onde e quem recebeu ----------
@@ -606,7 +684,7 @@ def montar_emendas(pessoas, saida):
             if c["cargo"] in CARGOS_CONGRESSO and c["ano"] in (2018, 2022) and c["sit"] in ("Eleito", "Suplente"):
                 por_urna[norm_nome(c["urna"])].add(chave)
     punidas = empresas_punidas()
-    autores, cidades, alertas = {}, {}, defaultdict(lambda: [0.0, "999999", "000000"])
+    autores, cidades, alertas, de_socio = {}, {}, defaultdict(lambda: [0.0, "999999", "000000"]), []
     with zipfile.ZipFile(caminho) as z, z.open("EmendasParlamentares_PorFavorecido.csv") as f:
         for x in csv.DictReader(io.TextIOWrapper(f, encoding="latin1"), delimiter=";"):
             mes, v = x["Ano/Mês"], float(x["Valor Recebido"].replace(".", "").replace(",", ".") or 0)
@@ -627,6 +705,8 @@ def montar_emendas(pessoas, saida):
             c["aut"][cod] += v
             c["fav"][fav] += v
             cnpj = so_digitos(x["Código do Favorecido"])
+            if cnpj[:8] in SOCIOS and len(cnpj) == 14:  # verba para empresa ou entidade de político: confere o autor depois
+                de_socio.append((cod, cnpj, f"{mes[:4]}-{mes[4:]}-01", fav, v))
             for ini, fim, desc, periodo, cod_san in (punidas.get(cnpj, ()) if len(cnpj) == 14 else ()):
                 if ini < mes <= fim:  # pago depois do mês em que a punição começou
                     al = alertas[(cod, cnpj, cod_san, fav, desc, periodo, cidade)]
@@ -643,9 +723,18 @@ def montar_emendas(pessoas, saida):
     sq_de = {}
     for cod, a in autores.items():
         chaves = por_urna.get(norm_nome(a["n"]), set())
-        a["sqs"] = [c["sq"] for c in pessoas[next(iter(chaves))]] if len(chaves) == 1 else []  # homônimo: não liga
+        a["chave"] = next(iter(chaves)) if len(chaves) == 1 else None  # homônimo: não liga
+        a["sqs"] = [c["sq"] for c in pessoas[a["chave"]]] if a["chave"] else []
         for sq in a["sqs"]:
             sq_de[sq] = cod
+    # verba para empresa ou entidade de político: do próprio autor, ou de outro político que já foi eleito
+    chave_de = {c["sq"]: chave for chave, cs in pessoas.items() for c in cs}
+    for cod, cnpj, data, fav, v in de_socio:
+        for dono in {chave_de[sq] for sq in SOCIOS[cnpj[:8]] if sq in chave_de}:
+            if dono == autores[cod]["chave"]:
+                pago_a_propria(dono, pessoas[dono], cnpj, data, fav, v, "emenda")
+            elif any(c["sit"] == "Eleito" for c in pessoas[dono]):
+                pago_a_propria(dono, pessoas[dono], cnpj, data, fav, v, f"emenda_de|{autores[cod]['n']}")
     lista_alertas = [[fav, cnpj, round(v), f"{mes_br(de)} a {mes_br(ate)}" if de != ate else mes_br(de), desc, periodo,
                       cod, cidade, f"https://portaldatransparencia.gov.br/sancoes/consulta/{cod_san}"]
                      for (cod, cnpj, cod_san, fav, desc, periodo, cidade), (v, de, ate) in alertas.items()]
@@ -715,6 +804,7 @@ def montar_cota(pessoas):
         forn = x["txtFornecedor"].strip()
         d["forn"][forn] += v
         cnpj, mes = so_digitos(x["txtCNPJCPF"]), (x["datEmissao"] or "")[:7].replace("-", "")
+        pago_a_propria(cpf, por_cpf[cpf], cnpj, (x["datEmissao"] or "")[:10], forn, v, "cota", x["urlDocumento"])
         for ini, fim, desc, periodo, cod_san in (punidas.get(cnpj, ()) if len(cnpj) == 14 and mes else ()):
             if ini < mes <= fim:
                 al = d["al"][(forn, cnpj, desc, periodo, cod_san)]
@@ -739,9 +829,66 @@ def montar_cota(pessoas):
                       "forn": topo(d["forn"], 8), "al": sorted(alertas, key=lambda a: -a[1])})
         for c in por_cpf[cpf]:
             por_sq[c["sq"]] = i
+    n_dep = len(saida)
+    cota_senado(pessoas, punidas, saida, por_sq, topo, mes_br)
     gravar_json(SAIDA.parent / "cota.json", {"dep": saida, "sq": por_sq})
-    print(f"cota: {len(saida)} deputados, {sum(len(d['al']) for d in saida)} notas pagas a empresa punida",
-          file=sys.stderr)
+    print(f"cota: {n_dep} deputados e {len(saida) - n_dep} senadores, "
+          f"{sum(len(d['al']) for d in saida)} notas pagas a empresa punida", file=sys.stderr)
+
+
+CEAPS = "https://www.senado.leg.br/transparencia/LAI/verba/despesa_ceaps_{}.csv"
+
+
+def cota_senado(pessoas, punidas, saida, por_sq, topo, mes_br):
+    """Gastos do mandato dos senadores (CEAPS). O arquivo traz o nome parlamentar; a lista oficial do Senado dá o
+    nome completo e a UF, que ligam à candidatura. Quem já saiu do Senado não está na lista e fica sem ligar."""
+    req = urllib.request.Request(SENADO, headers={**UA, "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        lista = [x["IdentificacaoParlamentar"] for x in json.load(r)["ListaParlamentarEmExercicio"]["Parlamentares"]["Parlamentar"]]
+    nome_completo = {norm_nome(x["NomeParlamentar"]): (x["UfParlamentar"], norm_nome(x["NomeCompletoParlamentar"])) for x in lista}
+    chave_de = {}
+    for chave, cs in pessoas.items():
+        for c in cs:
+            if c["cargo"] in CARGOS_SENADO and c["ano"] in (2018, 2022):
+                chave_de[(c["uf"], norm_nome(c["nome"]))] = chave
+    sen = {}
+    for ano in ANOS_COTA:
+        nome = f"ceaps_{ano}.csv"
+        if ano == dt.date.today().year:
+            (CACHE / nome).unlink(missing_ok=True)
+        with open(baixar(CEAPS.format(ano), nome), encoding="latin1", newline="") as f:
+            next(f)  # primeira linha: "ULTIMA ATUALIZACAO"
+            for x in csv.DictReader(f, delimiter=";"):
+                chave = chave_de.get(nome_completo.get(norm_nome(x["SENADOR"]), ("", "")))
+                if not chave:
+                    continue
+                v = float((x["VALOR_REEMBOLSADO"] or "0").replace(".", "").replace(",", "."))
+                d = sen.setdefault(chave, {"t": 0.0, "n": 0, "de": ano, "ate": ano, "cat": defaultdict(float),
+                                           "forn": defaultdict(float), "al": defaultdict(lambda: [0.0, "999999", "000000", ""])})
+                d["t"] += v
+                d["n"] += 1
+                d["de"], d["ate"] = min(d["de"], ano), max(d["ate"], ano)
+                d["cat"][x["TIPO_DESPESA"].split(",")[0].strip().capitalize()] += v
+                forn = x["FORNECEDOR"].strip()
+                d["forn"][forn] += v
+                cnpj, data = so_digitos(x["CNPJ_CPF"]), data_iso(x["DATA"])
+                mes = data[:7].replace("-", "")
+                pago_a_propria(chave, pessoas[chave], cnpj, data, forn, v, "cota")
+                for ini, fim, desc, periodo, cod_san in (punidas.get(cnpj, ()) if len(cnpj) == 14 and mes else ()):
+                    if ini < mes <= fim:
+                        al = d["al"][(forn, cnpj, desc, periodo, cod_san)]
+                        al[0] += v
+                        al[1], al[2] = min(al[1], mes), max(al[2], mes)
+                        break
+    for chave, d in sen.items():
+        i = len(saida)
+        alertas = [[forn, round(v), f"{mes_br(a)} a {mes_br(b)}" if a != b else mes_br(a), desc, periodo,
+                    f"https://portaldatransparencia.gov.br/sancoes/consulta/{cod}", ""]
+                   for (forn, cnpj, desc, periodo, cod), (v, a, b, _) in d["al"].items()]
+        saida.append({"casa": "o Senado", "t": round(d["t"]), "n": d["n"], "de": d["de"], "ate": d["ate"],
+                      "cat": topo(d["cat"], 6), "forn": topo(d["forn"], 8), "al": sorted(alertas, key=lambda a: -a[1])})
+        for c in pessoas[chave]:
+            por_sq[c["sq"]] = i
 
 
 # ---------- dinheiro de campanha e panorama geral ----------
@@ -750,12 +897,31 @@ CONTAS = "https://cdn.tse.jus.br/estatistica/sead/odsele/prestacao_contas/presta
 ANO_CAMPANHA = 2026
 
 
-def montar_campanha():
+def campanha_propria(pessoas, caminho):
+    """Gasto de campanha pago com fundo eleitoral ou partidário (dinheiro público) a empresa do próprio candidato.
+    O que foi pago com doação de pessoa ou empresa não é dinheiro público e fica de fora."""
+    chave_de = {c["sq"]: chave for chave, cs in pessoas.items() for c in cs}
+    achadas = {}  # número da despesa -> (pessoa, cnpj, fornecedor)
+    for x in ler_csv_zip(caminho, f"despesas_contratadas_candidatos_{ANO_CAMPANHA}_BRASIL.csv"):
+        cnpj, chave = so_digitos(x["NR_CPF_CNPJ_FORNECEDOR"]), chave_de.get(x["SQ_CANDIDATO"])
+        if chave and cnpj[:8] in SOCIOS:
+            achadas[x["SQ_DESPESA"]] = (chave, cnpj, x["NM_FORNECEDOR"].strip())
+    for x in ler_csv_zip(caminho, f"despesas_pagas_candidatos_{ANO_CAMPANHA}_BRASIL.csv"):
+        if (a := achadas.get(x["SQ_DESPESA"])) and "FUNDO" in x["DS_FONTE_DESPESA"].upper():
+            chave, cnpj, forn = a
+            pago_a_propria(chave, pessoas[chave], cnpj, data_iso(x["DT_PAGTO_DESPESA"]), forn,
+                           float(x["VR_PAGTO_DESPESA"].replace(",", ".") or 0), "campanha")
+
+
+def montar_campanha(pessoas):
     """Quanto cada candidato recebeu na campanha e quanto disso foi dinheiro público (fundo eleitoral e partidário)."""
     nome = f"contas_{ANO_CAMPANHA}.zip"
     (CACHE / nome).unlink(missing_ok=True)  # a prestação de contas é atualizada durante a campanha
+    caminho = baixar(CONTAS.format(ANO_CAMPANHA), nome)
+    if SOCIOS:
+        campanha_propria(pessoas, caminho)
     por_sq, fontes = defaultdict(lambda: [0.0, 0.0, 0.0]), defaultdict(float)
-    for x in ler_csv_zip(baixar(CONTAS.format(ANO_CAMPANHA), nome), "receitas_candidatos_%d_BRASIL.csv" % ANO_CAMPANHA):
+    for x in ler_csv_zip(caminho, "receitas_candidatos_%d_BRASIL.csv" % ANO_CAMPANHA):
         v = float(x["VR_RECEITA"].replace(",", ".") or 0)
         fonte = x["DS_FONTE_RECEITA"]
         r = por_sq[x["SQ_CANDIDATO"]]
@@ -828,16 +994,37 @@ def divida_publica():
             "por_segundo": round((atual - ano_antes) / (365 * 86400))}
 
 
-def montar_panorama(campanha):
+CORRUPCAO_PIB = (1.38, 2.3)  # % do PIB por ano: estudo da FIESP "Corrupção: custos econômicos e propostas de combate" (2010)
+
+
+def pib_periodos():
+    """PIB em valores correntes (Banco Central, SGS 4380, R$ milhões por mês) somado nos últimos 12, 36 e 120 meses:
+    base da estimativa de corrupção do site."""
+    hoje = dt.date.today()
+    url = (f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.4380/dados?formato=json"
+           f"&dataInicial=01/01/{hoje.year - 11}&dataFinal={hoje:%d/%m/%Y}")
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+            meses = sorted(json.load(r), key=lambda x: x["data"][6:] + x["data"][3:5])
+    except (urllib.error.URLError, TimeoutError, ValueError):
+        return None
+    v = [float(x["valor"]) * 1e6 for x in meses]
+    return {"ate": meses[-1]["data"][3:], "m12": round(sum(v[-12:])), "m36": round(sum(v[-36:])),
+            "m120": round(sum(v[-120:]))}
+
+
+def montar_panorama(campanha, empresas):
     tcu = RAIZ / "dados" / "tcu_total.json"
     emendas = json.loads((SAIDA.parent / "emendas.json").read_text("utf-8"))
     dados = {
         "campanha": campanha,
+        "empresas": empresas,
         "leniencia": acordos_leniencia(),
         "emendas": {"total": sum(a["t"] for a in emendas["autores"].values()),
                     "pix": sum(a["pix"] for a in emendas["autores"].values())},
         "tcu": json.loads(tcu.read_text("utf-8")) if tcu.exists() else None,
         "divida": divida_publica(),
+        "corrupcao": (pib := pib_periodos()) and {"pct": CORRUPCAO_PIB, **pib},
     }
     gravar_json(SAIDA.parent / "panorama.json", dados)
 
@@ -857,7 +1044,8 @@ def montar_precos(cands):
     origem = RAIZ / "dados" / "precos.json"
     if not origem.exists():
         return
-    itens = json.loads(origem.read_text("utf-8"))["itens"]
+    # o mesmo item pode vir repetido (dois lotes iguais na mesma compra): conta uma vez só
+    itens = list({(it[12], it[2], it[3], it[10]): it for it in json.loads(origem.read_text("utf-8"))["itens"]}.values())
 
     def grupo(it):
         return f"{it[0]}|{it[1]}|{it[6] if it[0] in POR_ESTADO else ''}"
@@ -872,6 +1060,14 @@ def montar_precos(cands):
     marcados, cidades, contagem = [], defaultdict(lambda: [0.0, 0, 0]), defaultdict(int)
     for it in itens:
         cat, prod, desc, unit, qtd, mun, uf, orgao, esfera, data, forn, cnpj, url = it
+        if esfera == "Municipal" and cnpj and cnpj[:8] in SOCIOS:
+            # a prefeitura comprou de empresa de quem estava no cargo na cidade (prefeito, vice ou vereador)
+            for sq in SOCIOS[cnpj[:8]]:
+                c = cands.get(sq)
+                if (c and c["sit"] == "Eleito" and c["ano"] == (2024 if data >= "2025" else 2020 if data >= "2021" else 0)
+                        and c["uf"] == uf and norm_nome(c["ue"]) == norm_nome(mun)):
+                    pago_a_propria(c["cpf"] or "sq" + sq, [c], cnpj, data, forn, unit * (qtd or 1),
+                                   f"prefeitura|{mun.title()}/{uf}|{c['cargo'].capitalize()}", url)
         g = grupo(it)
         if g not in normal or not mun:
             continue
@@ -897,7 +1093,7 @@ def montar_precos(cands):
 
 
 def resumo(pessoa):
-    """Condenações confirmadas e valor que o TCU mandou devolver (só decisão final)."""
+    """Condenações confirmadas e dinheiro que sumiu segundo o TCU (só decisão final)."""
     ks = pessoa["k"] if pessoa else []
     return (sum(k["s"] in ("final", "sancao") for k in ks),
             round(sum(k.get("deb", 0) for k in ks if k["s"] == "final")))

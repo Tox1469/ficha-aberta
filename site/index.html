@@ -92,6 +92,9 @@ label.f input,label.f select{height:40px;border:1px solid var(--line2);border-ra
 .contador>b{font-size:clamp(20px,3vw,32px);letter-spacing:-.02em;line-height:1.15;overflow-wrap:anywhere}
 .contador .pequena{color:#d0d5dd}
 .contador a{color:#fff}
+.contador.corrupcao{grid-column:1/-1;background:#4a1d0e}
+.contador .periodos{display:flex;flex-wrap:wrap;gap:6px 28px;margin:6px 0 4px;font-size:15px;color:#fff}
+.contador .periodos b{font-size:17px}
 .impostometro{display:flex;flex-direction:column;gap:4px;background:var(--ink);color:#fff;border-radius:16px;padding:20px 24px;margin:16px 0 0}
 .impostometro>span:first-child{font-size:14px;color:#d0d5dd}
 .impostometro>b{font-size:clamp(26px,6vw,44px);letter-spacing:-.02em;line-height:1.1}
@@ -239,7 +242,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
     </div>
     <nav role="tablist">
       <button role="tab" data-aba="candidatos" aria-selected="true">Ranking</button>
-      <button role="tab" data-aba="parquinhos" aria-selected="false">Pago a mais</button>
+      <button role="tab" data-aba="parquinhos" aria-selected="false">Preço inflado</button>
       <button role="tab" data-aba="partidos" aria-selected="false">Partidos</button>
       <button role="tab" data-aba="inicio" aria-selected="false">Sua cidade</button>
       <button role="tab" data-aba="prefeituras" aria-selected="false">Prefeituras</button>
@@ -262,6 +265,12 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
         <span class="rot">Impostos pagos em <span id="impAno">2026</span>, até agora</span>
         <b id="impostos" class="num">R$ …</b>
         <span class="pequena">R$ 131 mil por segundo. Estimativa com o total de 2025 do <a href="https://www.tesourotransparente.gov.br/publicacoes/carga-tributaria-do-governo-geral/2025/114" target="_blank" rel="noopener">Tesouro Nacional</a> (R$ 4,13 trilhões).</span>
+      </div>
+      <div class="contador corrupcao" id="corrupcao" hidden>
+        <span class="rot">Corrupção estimada em <span id="corAno">2026</span>, até agora</span>
+        <b id="corValor" class="num">R$ …</b>
+        <div class="periodos num" id="corPeriodos"></div>
+        <span class="pequena" id="corNota"></span>
       </div>
     </div>
     <div class="panorama" id="panorama" hidden></div>
@@ -312,11 +321,11 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
   </section>
 
   <section id="aba-candidatos">
-    <h1 class="titulo">Ranking de quem mais foi condenado a devolver dinheiro público</h1>
+    <h1 class="titulo">Na mão de quem mais sumiu dinheiro público</h1>
     <div class="barra">
       <span id="total" class="num">Carregando dados…</span>
       <label>Ordenar por <select id="ordem">
-        <option value="deb">Maior valor a devolver</option>
+        <option value="deb">Mais dinheiro sumido</option>
         <option value="conf">Mais condenações</option>
         <option value="camp">Mais dinheiro público de campanha (2026)</option>
         <option value="cargo">Cargo (do presidente ao vereador)</option>
@@ -329,8 +338,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
   </section>
 
   <section id="aba-parquinhos" hidden>
-    <h1 class="titulo">Quanto pagaram a mais nas compras do governo</h1>
-    <p class="nota">Cada compra é comparada com o <b>preço normal do mesmo produto</b>: o preço do meio que os outros órgãos pagaram (dipirona 500 mg com dipirona 500 mg, ar-condicionado de 12 mil BTUs com o de 12 mil BTUs, gasolina com gasolina do mesmo estado). Quando passou do dobro, aparece aqui quanto foi pago a mais. Preço alto não prova roubo: o produto pode ser de outra marca ou vir com instalação. Leia a descrição e confira a prova.</p>
+    <h1 class="titulo">Compras com preço inflado</h1>
+    <p class="nota"><b>Preço inflado é o jeito mais comum de desviar dinheiro em compra pública:</b> a prefeitura paga caro, a empresa embolsa a diferença. Aqui cada compra é comparada com o <b>preço normal do mesmo produto</b>, o preço do meio que os outros órgãos pagaram (dipirona 500 mg com dipirona 500 mg, ar-condicionado de parede de 12 mil BTUs com o mesmo tipo, gangorra de ferro de 3 lugares com gangorra de ferro de 3 lugares, gasolina com gasolina do mesmo estado). Aparece toda compra que pagou o dobro ou mais. Parque montado (com torres e módulos) e brinquedo adaptado ficam de fora, porque variam demais para ter um preço normal. Nem todo preço alto é roubo (às vezes o produto é de outra marca ou vem com instalação), por isso cada caso tem a descrição e a prova para conferir. Quando a compra é um registro de preço, a quantidade é o máximo que a prefeitura pode comprar, então o valor pago a mais pode ser menor.</p>
     <p class="x" id="qresumo">Carregando…</p>
     <form class="filtros pfiltros" id="qfiltros" onsubmit="return false">
       <label class="f">Buscar cidade<input type="search" name="q" placeholder="Nome da cidade" autocomplete="off"></label>
@@ -341,14 +350,14 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
     <button class="mais" id="qmais" type="button" hidden>Mostrar mais</button>
   </section>
   <section id="aba-partidos" hidden>
-    <p class="nota">Partido grande tem mais candidato, então sempre teria mais caso. Por isso cada partido é comparado com o <b>normal pro tamanho dele</b>: quanto teria se o dinheiro que o TCU mandou devolver fosse dividido pelo número de candidatos. "2 vezes o normal" quer dizer o dobro do esperado pelo tamanho. <b>Clique no nome do partido</b> para ver todo mundo dele com condenação, do maior valor para o menor. Os filtros de cima também valem aqui. O partido é o da candidatura, não o atual.</p>
+    <p class="nota">Partido grande tem mais candidato, então sempre teria mais caso. Por isso cada partido é comparado com o <b>normal pro tamanho dele</b>: quanto teria se o dinheiro que sumiu (condenações do TCU) fosse dividido pelo número de candidatos. "2 vezes o normal" quer dizer o dobro do esperado pelo tamanho. <b>Clique no nome do partido</b> para ver todo mundo dele com condenação, do maior valor para o menor. Os filtros de cima também valem aqui. O partido é o da candidatura, não o atual.</p>
     <table class="ptab">
       <thead><tr>
         <th>Partido</th>
         <th class="r">Candidatos checados</th>
         <th class="r"><button type="button" data-po="num" aria-pressed="false">Já condenados</button></th>
         <th><button type="button" data-po="taxa" aria-pressed="false">Condenados a cada mil</button></th>
-        <th class="r"><button type="button" data-po="val" aria-pressed="false">Mandaram devolver</button></th>
+        <th class="r"><button type="button" data-po="val" aria-pressed="false">Dinheiro que sumiu</button></th>
         <th class="r">Normal pro tamanho</th>
         <th class="r"><button type="button" data-po="razao" aria-pressed="true">Comparado ao normal</button></th>
       </tr></thead>
@@ -380,6 +389,10 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
   <section id="aba-emendas" hidden>
     <h1 class="titulo">Verba que os políticos mandam</h1>
     <p class="nota">Todo ano cada deputado e senador escolhe para onde vai uma parte do dinheiro do governo federal: qual cidade, qual entidade, às vezes direto para uma empresa. O nome oficial disso é "emenda parlamentar". Aqui está o que foi pago desde 2019 e para quem, segundo o Portal da Transparência do governo.</p>
+    <h3 class="sub3">Dinheiro público que foi para empresas de políticos</h3>
+    <p class="x" id="presumo">Carregando…</p>
+    <table class="ptab"><thead><tr><th>#</th><th>Político</th><th>Cargo</th><th>Partido</th><th class="r">Valor</th><th>Por onde</th></tr></thead><tbody id="ppropria"></tbody></table>
+    <p class="pequena">Cruza o cadastro de sócios e dirigentes da Receita Federal com verbas (emendas), gastos do mandato (cota), o fundo eleitoral de 2026 e compras das prefeituras. Entra a verba que o próprio político mandou para a empresa dele e a verba que outros mandaram para empresa de quem já foi eleito. Só conta pagamento feito quando a pessoa já estava na empresa. Estatais ficam de fora. Clique no nome para ver cada pagamento e a prova.</p>
     <h3 class="sub3">Verba paga a empresas e entidades que estavam proibidas de vender para o governo</h3>
     <p class="x" id="eresumo">Carregando…</p>
     <div id="elista"></div>
@@ -410,8 +423,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
 
     <h2>Tipos de caso</h2>
     <ul>
-      <li><b>Condenado pelo TCU a devolver dinheiro público:</b> a pessoa cuidou de dinheiro federal (um convênio, uma obra, um repasse para a prefeitura) e o TCU concluiu que ela não provou onde o dinheiro foi parar ou que ele foi mal usado. O tribunal mandou devolver. Pode ser desvio, superfaturamento, obra não entregue ou simplesmente não ter prestado contas: a decisão completa está no link.</li>
-      <li><b>Contas reprovadas ou multado pelo TCU:</b> o TCU reprovou as contas, mas não mandou devolver dinheiro (às vezes só aplicou multa).</li>
+      <li><b>Dinheiro público que sumiu:</b> a pessoa cuidou de dinheiro federal (um convênio, uma obra, um repasse para a prefeitura) e o Tribunal de Contas da União (TCU) concluiu que o dinheiro foi desviado, mal usado ou gasto sem provar onde, e condenou a pessoa a pagar de volta. Ser condenado a pagar não quer dizer que pagou. Pode ser desvio, superfaturamento, obra não entregue ou simplesmente não ter prestado contas: a decisão completa está no link.</li>
+      <li><b>Contas reprovadas ou multado pelo TCU:</b> o TCU reprovou as contas, mas não apontou dinheiro sumido (às vezes só aplicou multa).</li>
       <li><b>Proibido pelo TCU de ocupar cargo de confiança:</b> punição para irregularidades graves.</li>
       <li><b>Condenado na Justiça por improbidade:</b> condenação por usar o cargo de forma desonesta ou causar prejuízo aos cofres públicos (Lei de Improbidade).</li>
       <li><b>Servidor punido:</b> demitido, destituído ou que perdeu a aposentadoria no governo federal.</li>
@@ -419,11 +432,11 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
     </ul>
 
     <h2>De onde vêm os valores em reais</h2>
-    <p>O TCU publica o texto de todas as suas decisões. Para cada condenação de um candidato, o site lê a decisão e soma o que o tribunal mandou a pessoa devolver e, separado, a multa. O que ela já tinha devolvido é descontado.</p>
+    <p>O TCU publica o texto de todas as suas decisões. Para cada condenação de um candidato, o site lê a decisão e soma o dinheiro que sumiu (o que o tribunal condenou a pessoa a pagar de volta) e, separado, a multa. O que ela já tinha pagado de volta é descontado.</p>
     <ul>
       <li><b>É o valor da época:</b> o número que está na decisão, sem correção nem juros. A dívida de hoje é maior.</li>
       <li><b>Dívida em conjunto:</b> quando o TCU condena duas ou mais pessoas (ou uma empresa) pelo mesmo dinheiro, cada uma pode ser cobrada pelo valor todo. Por isso o valor inteiro aparece para cada uma, e a soma do topo pode contar o mesmo dinheiro mais de uma vez.</li>
-      <li><b>É o que mandaram devolver, não o que se sabe que foi roubado.</b> Em parte dos casos o problema é não ter prestado contas, e a decisão não diz se o dinheiro foi desviado.</li>
+      <li><b>Sumiu não quer dizer roubo provado.</b> Em parte dos casos a pessoa não prestou contas e a decisão não diz se o dinheiro foi desviado: só que ela não provou onde ele foi parar. O TCU julga contas, não crimes.</li>
       <li>Antes de 1994 a moeda era outra (cruzeiro). Esses valores não entram na soma; a ficha avisa e mostra o trecho.</li>
       <li>A leitura é automática. A ficha mostra o trecho da decisão de onde saiu o número, para qualquer um conferir.</li>
     </ul>
@@ -434,6 +447,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;paddin
       <li><b>Cota parlamentar:</b> notas que cada deputado federal apresentou à Câmara para ser reembolsado (combustível, carro, escritório, divulgação). Ligada pelo cadastro oficial do deputado.</li>
       <li><b>Pago a quem estava proibido de contratar:</b> o site cruza quem recebeu emenda ou cota com o cadastro de punidos da CGU (CEIS). Só conta a declaração de inidoneidade (vale para qualquer governo) e o impedimento ou a suspensão dados por órgão federal, e só se o pagamento foi depois do mês em que a punição começou. O pagamento pode ser de contrato assinado antes da punição, que a lei permite manter.</li>
       <li><b>Bens:</b> o que cada candidato declarou ao TSE em cada eleição, pelo valor que ele mesmo digitou. Tem erro de digitação na base do TSE.</li>
+      <li><b>Empresas dos políticos:</b> vêm do cadastro de sócios que a Receita Federal publica todo mês. A Receita mostra o nome do sócio e só os 6 números do meio do CPF; o site liga ao candidato quando o nome completo e esses 6 números batem. O CPF serve só para essa ligação e não aparece no site.</li>
+      <li><b>Dinheiro público para empresa de político:</b> nota da cota do mandato, verba (emenda) mandada pelo próprio parlamentar, gasto da campanha de 2026 pago com fundo eleitoral ou partidário, ou compra da prefeitura onde a pessoa era prefeito, vice ou vereador, pago a empresa da qual ela já era sócia ou dirigente na data. Também entra a verba mandada por outros políticos para empresa ou entidade de quem já foi eleito. Estatais (como Infraero e Dataprev) ficam de fora: diretor de estatal não é dono. A Receita só mostra o quadro atual, então quem já saiu da empresa fica de fora. As compras de prefeitura são só as que o site já lê do Portal Nacional de Contratações (as mesmas da aba Preço inflado). Receber verba não prova nada errado: a ficha mostra o pagamento e a prova para cada um conferir.</li>
     </ul>
 
     <h2>Prefeituras</h2>
@@ -525,7 +540,7 @@ function crescimento(p) {
   const ds = declaracoes(p);
   return ds.length > 1 ? { de: ds[0], ate: ds[ds.length - 1], valor: ds[ds.length - 1][1] - ds[0][1] } : null;
 }
-// só decisão final conta no valor: é o que o TCU mandou devolver de fato
+// só decisão final conta no valor: é o dinheiro que o TCU concluiu que sumiu
 const somaDeb = ks => ks.reduce((t, k) => t + (k.s === "final" && k.deb || 0), 0);
 const somaMul = ks => ks.reduce((t, k) => t + (k.s === "final" && k.mul || 0), 0);
 const local = c => titulo(c[3]) + (norm(c[3]) !== norm(UFS[c[2]] || c[2]) && c[2] !== "BR" ? "/" + c[2] : "");
@@ -568,12 +583,13 @@ function arquivoTodos(f) {
   if (f.mostrar === "registro" || !f.ano) return null;
   return ANOS_GERAIS.includes(f.ano) ? String(f.ano) : f.uf ? `${f.ano}-${f.uf}` : null;
 }
+function pessoaDeLinha([sq, urna, nome, cargo, uf, ue, sgUe, partido, sit, v, ano, nc, bens, bensAnt]) {
+  const p = { i: sq, u: titulo(urna), n: titulo(nome), v: !!v, k: [], busca: norm(nome + " " + urna), c: [[ano, cargo, uf, ue, partido, sit, urlTSE(ano, uf, sq, sgUe, ue), sq, nc, bens]], bensAnt };
+  porId.set(sq, p);
+  return p;
+}
 function carregarTodos(arq) {
-  todos[arq] ??= fetch(`todos/${arq}.json`).then(r => r.ok ? r.json() : []).then(linhas => linhas.map(([sq, urna, nome, cargo, uf, ue, sgUe, partido, sit, v, ano, nc, bens, bensAnt]) => {
-    const p = { i: sq, u: titulo(urna), n: titulo(nome), v: !!v, k: [], busca: norm(nome + " " + urna), c: [[ano, cargo, uf, ue, partido, sit, urlTSE(ano, uf, sq, sgUe, ue), sq, nc, bens]], bensAnt };
-    porId.set(sq, p);
-    return p;
-  })).catch(() => []);
+  todos[arq] ??= fetch(`todos/${arq}.json`).then(r => r.ok ? r.json() : []).then(linhas => linhas.map(pessoaDeLinha)).catch(() => []);
   return todos[arq];
 }
 
@@ -617,7 +633,7 @@ function colunaValor(r) {
     return g ? `<b>${g.valor >= 0 ? "+" : "-"}${compacto(Math.abs(g.valor))}</b><span>de ${g.de[0]} a ${g.ate[0]}</span>` : `<span>só uma declaração</span>`;
   }
   if (ordem === "camp") return r.camp ? `<b>${compacto(r.camp)}</b><span>de dinheiro público</span>` : `<span>-</span>`;
-  return r.deb ? `<b>${reais(r.deb)}</b><span>a devolver</span>` : `<span>-</span>`;
+  return r.deb ? `<b>${reais(r.deb)}</b><span>sumiu</span>` : `<span>-</span>`;
 }
 
 function linha(r, i) {
@@ -641,7 +657,7 @@ function desenharLista(f) {
   if (!filtradas.length) {
     lista.innerHTML = `<div class="vazio">Nenhum candidato com esses filtros.</div>`;
   } else {
-    lista.innerHTML = `<div class="cab"><span>#</span><span>Candidato</span><span>Candidatura</span><span>Partido</span><span>${{ bens: "Bens declarados", cresc: "Patrimônio", camp: "Campanha 2026" }[$("#ordem").value] || "Mandaram devolver"}</span><span>Condenações</span><span>Quem condenou</span></div>`
+    lista.innerHTML = `<div class="cab"><span>#</span><span>Candidato</span><span>Candidatura</span><span>Partido</span><span>${{ bens: "Bens declarados", cresc: "Patrimônio", camp: "Campanha 2026" }[$("#ordem").value] || "Dinheiro que sumiu"}</span><span>Condenações</span><span>Quem condenou</span></div>`
       + filtradas.slice(0, mostrando).map(linha).join("");
   }
   const deb = filtradas.reduce((t, r) => t + r.deb, 0), mul = filtradas.reduce((t, r) => t + r.mul, 0);
@@ -650,9 +666,9 @@ function desenharLista(f) {
   if (f.mostrar === "todos" && !arquivoTodos(f))
     aviso = !f.ano ? " Aqui aparece só quem tem registro: escolha uma eleição para ver todos os candidatos."
       : ` Aqui aparece só quem tem registro: escolha o estado para ver todos os candidatos de ${f.ano}.`;
-  $("#total").innerHTML = `<b>${fmt(filtradas.length)}</b> ${filtradas.length === 1 ? "candidato" : "candidatos"}, ${fmt(com)} com algum registro. Somando, o TCU mandou devolver <b>${curto(deb)}</b> e cobrou <b>${curto(mul)}</b> em multas (valores da época, sem correção).${aviso}`;
+  $("#total").innerHTML = `<b>${fmt(filtradas.length)}</b> ${filtradas.length === 1 ? "candidato" : "candidatos"}, ${fmt(com)} com algum registro. Somando, <b>${curto(deb)}</b> de dinheiro público sumiu na mão dessas pessoas, segundo o TCU, mais <b>${curto(mul)}</b> em multas (valores da época, sem correção).${aviso}`;
   $(".titulo").textContent = (f.mostrar === "nocargo" ? "Quem está no cargo hoje. " : "") + {
-    deb: "Ranking de quem mais foi condenado a devolver dinheiro público", conf: "Ranking de quem tem mais condenações",
+    deb: "Na mão de quem mais sumiu dinheiro público", conf: "Ranking de quem tem mais condenações",
     cargo: "Candidatos do presidente ao vereador", rec: "Condenações mais recentes primeiro", nome: "Candidatos em ordem alfabética",
     bens: "Quem declarou ter mais bens", cresc: "De quem o patrimônio declarado mais cresceu",
     camp: "Quem mais recebeu dinheiro público para a campanha de 2026",
@@ -677,7 +693,7 @@ function desenharPartidos(f) {
     // valor conta uma vez por pessoa em cada partido, mesmo com várias candidaturas
     for (const pt of new Set(cs.map(c => c[4]))) val[pt] = (val[pt] || 0) + somaDeb(ks);
   }
-  // "normal pro tamanho": quanto o partido teria se o dinheiro mandado devolver fosse dividido pelo número de candidatos
+  // "normal pro tamanho": quanto o partido teria se o dinheiro que sumiu fosse dividido pelo número de candidatos
   const totalDen = Object.values(den).reduce((a, b) => a + b, 0), totalVal = Object.values(val).reduce((a, b) => a + b, 0);
   const linhas = Object.keys(den).filter(pt => den[pt] > 0).map(pt => {
     const esperado = totalDen ? totalVal * den[pt] / totalDen : 0, v = val[pt] || 0;
@@ -712,14 +728,14 @@ function abrirPartido(pt) {
   const dlg = $("#ficha");
   dlg.innerHTML = `<div class="fcab"><div><h2 id="fnome">${esc(pt)}</h2>
       <p>${fmt(l.den)} candidaturas checadas${f.ano ? " em " + f.ano : ""}, ${fmt(l.num)} delas de gente já condenada (${l.taxa.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} a cada mil).</p>
-      <div class="totais num"><span>Mandaram devolver <b>${curto(l.val)}</b></span><span>Normal pro tamanho <b>${curto(l.esperado)}</b></span><span><b>${vezes(l.razao)}</b> o normal</span></div></div>
+      <div class="totais num"><span>Sumiu <b>${curto(l.val)}</b></span><span>Normal pro tamanho <b>${curto(l.esperado)}</b></span><span><b>${vezes(l.razao)}</b> o normal</span></div></div>
       <button type="button" class="fechar" aria-label="Fechar" onclick="fecharFicha()">×</button></div>
     <div class="fcorpo">
-      <p class="pequena">"Normal pro tamanho" é quanto o partido teria se o dinheiro que o TCU mandou devolver fosse dividido entre os partidos pelo número de candidatos de cada um. Mesma conta para todos. O partido é o da candidatura.</p>
+      <p class="pequena">"Normal pro tamanho" é quanto o partido teria se o dinheiro que sumiu (condenações do TCU) fosse dividido entre os partidos pelo número de candidatos de cada um. Mesma conta para todos. O partido é o da candidatura.</p>
       <h3>${fmt(gente.length)} ${gente.length === 1 ? "pessoa" : "pessoas"} com condenação, do maior valor para o menor</h3>
       <div class="cartoes">${gente.slice(0, 300).map((x, i) => `<button type="button" class="pessoa" data-ficha-emenda="${esc(x.p.i)}">
         <span class="pnome"><b>${i + 1}. ${esc(x.p.u)}</b><span>${esc(nomeCargo(x.c[1]))} em ${x.c[0]} · ${esc(local(x.c))}</span></span>
-        <span class="pill ruim">${x.deb ? "Devolver " + curto(x.deb) : x.conf + (x.conf === 1 ? " condenação" : " condenações")}</span></button>`).join("")}</div>
+        <span class="pill ruim">${x.deb ? "Sumiu " + curto(x.deb) : x.conf + (x.conf === 1 ? " condenação" : " condenações")}</span></button>`).join("")}</div>
       ${gente.length > 300 ? `<p class="pequena">Mostrando os 300 primeiros. Use o Ranking com o filtro de partido para ver todos.</p>` : ""}
     </div>`;
   if (!dlg.open) dlg.showModal();
@@ -735,8 +751,8 @@ function caso(k) {
     ${k.st ? `<div class="meta">${esc(k.st)}</div>` : ""}
     ${san.length ? `<ul>${san.map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
     ${k.x ? `<div class="x">${esc(k.x)}</div>` : ""}
-    ${k.deb || k.mul ? `<div class="valores num">${k.deb ? `<span>Mandaram devolver<br><b>${reais(k.deb, 1)}</b></span>` : ""}${k.mul ? `<span>Multa<br><b>${reais(k.mul, 1)}</b></span>` : ""}<span class="pequena">Valor da época, sem correção: hoje a dívida é maior${k.sol ? ". Dívida em conjunto com outros condenados: cada um pode ser cobrado pelo valor todo" : ""}.</span></div>`
-      : k.vx && !k.ant ? `<div class="x">Não achamos valor a devolver nem multa para esta pessoa no texto da decisão. Confira no link.</div>` : ""}
+    ${k.deb || k.mul ? `<div class="valores num">${k.deb ? `<span>Dinheiro que sumiu<br><b>${reais(k.deb, 1)}</b></span>` : ""}${k.mul ? `<span>Multa<br><b>${reais(k.mul, 1)}</b></span>` : ""}<span class="pequena">Condenado a pagar de volta. Valor da época, sem correção: hoje a dívida é maior${k.sol ? ". Dívida em conjunto com outros condenados: cada um pode ser cobrado pelo valor todo" : ""}.</span></div>`
+      : k.vx && !k.ant ? `<div class="x">Não achamos o valor que sumiu nem multa para esta pessoa no texto da decisão. Confira no link.</div>` : ""}
     ${k.ant ? `<div class="x">Parte da dívida é de antes do Real (em cruzeiro) e não entrou na soma: veja o valor na decisão.</div>` : ""}
     ${k.tr ? `<details><summary>Prova: ler o trecho da decisão de onde saiu o valor</summary><p>${esc(k.tr)}</p></details>` : ""}
     <div class="lk">${(k.l || []).filter(l => /^https:\/\//.test(l[1])).map(l => `<a href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join("")}</div>
@@ -757,7 +773,7 @@ function abrirFicha(id) {
     ? "Nada encontrado nas listas do TSE, do TCU e da CGU. Isso não garante ficha limpa: processos criminais, tribunais de contas dos estados e investigações em andamento não entram aqui (veja Como funciona)."
     : "Nada na Justiça Eleitoral. O TSE não divulgou o CPF desta candidatura (2024), então não deu para checar no TCU e na CGU.";
   dlg.innerHTML = `<div class="fcab"><div><h2 id="fnome">${esc(p.u)}</h2><p>${esc(p.n)}</p>
-      ${deb || mul ? `<div class="totais num"><span>O TCU mandou devolver <b>${reais(deb, 1)}</b></span><span>Multas <b>${reais(mul, 1)}</b></span></div>` : ""}
+      ${deb || mul ? `<div class="totais num"><span>Dinheiro público que sumiu na mão dessa pessoa <b>${reais(deb, 1)}</b></span><span>Multas <b>${reais(mul, 1)}</b></span></div>` : ""}
       ${g ? `<div class="totais num"><span>Bens declarados: <b>${compacto(g.de[1])}</b> em ${g.de[0]} e <b>${compacto(g.ate[1])}</b> em ${g.ate[0]}</span></div>` : ""}</div>
       <button type="button" class="fechar" aria-label="Fechar" onclick="fecharFicha()">×</button></div>
     <div class="fcorpo">
@@ -767,6 +783,7 @@ function abrirFicha(id) {
       <div id="fichaCampanha"></div>
       <div id="fichaEmendas"></div>
       <div id="fichaCota"></div>
+      <div id="fichaEmpresas"></div>
       <p class="pequena">Bens são os que o próprio candidato declarou ao TSE em cada eleição, pelo valor que ele digitou (geralmente o de compra, sem atualizar). Tem erro de digitação, como casa de "R$ 1 bilhão": confira a lista de bens na ficha do TSE. Aumento de patrimônio não é prova de nada: pode vir de herança, salário ou empresa.</p>
       <p class="rodapeF">${p.v ? "Ligação feita pelo CPF registrado no TSE." : "CPF desta candidatura não é público (2024): só aparecem os casos da própria Justiça Eleitoral."} Confira sempre no link oficial. Viu algo errado? <a href="https://github.com/Tox1469/ficha-aberta/issues/new?title=${assunto}" target="_blank" rel="noopener">Peça correção</a>.</p>
     </div>`;
@@ -787,6 +804,11 @@ function abrirFicha(id) {
   carregarEmendas().then(e => {
     const cod = e && p.c.map(c => e.sq[c[7]]).find(Boolean), alvo = $("#fichaEmendas");
     if (cod && alvo && dlg.open && $("#fnome").textContent === p.u) alvo.innerHTML = blocoEmendasAutor(e, cod);
+  });
+  const sq = p.c[0][7];
+  Promise.all([carregarEmpresas(sq.slice(-2)), carregarListaEmpresas()]).then(([pd, l]) => {
+    const d = pd && pd[sq], alvo = $("#fichaEmpresas");
+    if (d && alvo && dlg.open && $("#fnome").textContent === p.u) alvo.innerHTML = blocoEmpresas(d, l && l.mes);
   });
 }
 function fecharFicha() { $("#ficha").close(); }
@@ -835,7 +857,7 @@ async function atualizar() {
     return;
   }
   if (abaAtual === "como") return salvarHash();
-  if (abaAtual === "emendas") return desenharEmendas();
+  if (abaAtual === "emendas") return desenharEmpresasPropria(), desenharEmendas();
   if (abaAtual === "parquinhos") return desenharParquinhos();
   if ($("#ordem").value === "camp") {
     if (form.ano.value !== "2026") form.ano.value = "2026";
@@ -937,7 +959,7 @@ async function carregarPrefeituras() {
 }
 
 function linhaCidade(c, i, ordem) {
-  const p = c.prefeito; // [sq, nome de urna, partido, condenações, valor a devolver]
+  const p = c.prefeito; // [sq, nome de urna, partido, condenações, dinheiro que sumiu]
   const [razao, rotulo] = ordem === "adm" ? [c.adm, "na Administração"] : ordem === "cam" ? [c.cam, "na Câmara"] : [c.razao, "no total"];
   const roy = c.receita ? c.royalties / c.receita : 0;
   return `<button type="button" class="item pitem" data-m="${c.ibge}">
@@ -945,7 +967,7 @@ function linhaCidade(c, i, ordem) {
     <span class="nome"><b>${esc(c.nome)}/${esc(c.uf)}</b><span>${fmt(c.pop)} moradores</span></span>
     <span class="cand num">${curto(c.gasto)} em ${c.ano}<span>${reais(c.hab)} por morador</span></span>
     <span class="reais num"><b>${razao ? vezes(razao) : "-"}</b><span>o normal ${rotulo}</span></span>
-    <span class="extra">${roy >= 0.1 ? `<span class="chip">${Math.round(roy * 100)}% veio de royalties</span>` : ""}${p ? `<span class="chip">Prefeito: ${esc(p[1])} (${esc(p[2])})</span>${p[3] ? `<span class="chip s-final">${p[3]} ${p[3] === 1 ? "condenação" : "condenações"}${p[4] ? ", " + curto(p[4]) + " a devolver" : ""}</span>` : ""}` : ""}${c.outros.length ? `<span class="chip s-sancao">${c.outros.length} vereador/vice com condenação</span>` : ""}</span>
+    <span class="extra">${roy >= 0.1 ? `<span class="chip">${Math.round(roy * 100)}% veio de royalties</span>` : ""}${p ? `<span class="chip">Prefeito: ${esc(p[1])} (${esc(p[2])})</span>${p[3] ? `<span class="chip s-final">${p[3]} ${p[3] === 1 ? "condenação" : "condenações"}${p[4] ? ", sumiu " + curto(p[4]) : ""}</span>` : ""}` : ""}${c.outros.length ? `<span class="chip s-sancao">${c.outros.length} vereador/vice com condenação</span>` : ""}</span>
   </button>`;
 }
 
@@ -980,7 +1002,7 @@ function abrirCidade(ibge) {
     return `<tr${r >= 2 ? ' class="alto"' : ""}><td>${esc(NOME_AREA[a] || a)}</td><td class="r num">${curto(v)}</td><td class="r num">${reais(hab)}</td><td class="r num">${nrm ? reais(nrm) : "-"}</td><td class="r num"><b>${r ? vezes(r) : "-"}</b></td></tr>`;
   }).join("");
   const pessoa = (sq, nome, cargo, partido, conf, deb) => `<div><b>${esc(nome)}</b><span>${esc(cargo)}</span><span>${esc(partido)}</span>${conf
-    ? `<span class="chip s-final">${conf} ${conf === 1 ? "condenação" : "condenações"}${deb ? ", " + curto(deb) + " a devolver" : ""}</span><a href="#" data-ficha="${esc(sq)}">Ver a ficha</a>`
+    ? `<span class="chip s-final">${conf} ${conf === 1 ? "condenação" : "condenações"}${deb ? ", sumiu " + curto(deb) : ""}</span><a href="#" data-ficha="${esc(sq)}">Ver a ficha</a>`
     : `<span class="chip">Nada encontrado</span>`}</div>`;
   const p = c.prefeito;
   const slug = norm(c.nome).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -1033,6 +1055,20 @@ function contarDivida(dv) {
   $("#divida").hidden = false;
 }
 
+// ---------- corrupção estimada: % do PIB (estudo da FIESP) sobre o PIB do Banco Central ----------
+function contarCorrupcao(c) {
+  const [baixo, alto] = c.pct.map(p => p / 100), porSegundo = c.m12 / (365 * 86400);
+  const tick = () => {
+    const agora = new Date(), seg = (agora - Date.UTC(agora.getUTCFullYear(), 0, 1, 3)) / 1000;
+    $("#corValor").textContent = "R$ " + Math.floor(porSegundo * baixo * seg).toLocaleString("pt-BR");
+    $("#corAno").textContent = agora.getUTCFullYear();
+  };
+  $("#corPeriodos").innerHTML = `<span>Últimos 3 anos: <b>${curto(c.m36 * baixo)} a ${curto(c.m36 * alto)}</b></span><span>Últimos 10 anos: <b>${curto(c.m120 * baixo)} a ${curto(c.m120 * alto)}</b></span>`;
+  $("#corNota").innerHTML = `Estimativa, não é dado oficial. Um <a href="https://exame.com/economia/fiesp-corrupcao-brasil-custa-r-69-bi-ao-ano-559419/" target="_blank" rel="noopener">estudo da FIESP</a> (2010) calculou que a corrupção custa de ${c.pct[0].toLocaleString("pt-BR")}% a ${c.pct[1].toLocaleString("pt-BR")}% de tudo que o país produz (o PIB) por ano. O contador usa o valor mais baixo sobre o <a href="https://www3.bcb.gov.br/sgspub/" target="_blank" rel="noopener">PIB do Banco Central</a> (até ${c.ate})`;
+  tick(); setInterval(tick, 100);
+  $("#corrupcao").hidden = false;
+}
+
 // ---------- quanto dinheiro: os números grandes, cada um com a fonte ----------
 let CAMP = null;
 const carregarCampanha = () => (CAMP ??= fetch("campanha.json").then(r => r.ok ? r.json() : null).catch(() => null));
@@ -1041,10 +1077,12 @@ const publico = r => r ? r[1] + r[2] : 0; // fundo eleitoral + fundo partidário
 fetch("panorama.json").then(r => r.ok ? r.json() : null).then(d => {
   if (!d) return;
   if (d.divida) contarDivida(d.divida);
+  if (d.corrupcao) contarCorrupcao(d.corrupcao);
   const linhas = [];
-  if (d.tcu) linhas.push(`<li><b>${curto(d.tcu.total)}</b> o Tribunal de Contas da União (TCU) já mandou devolver desde ${Object.keys(d.tcu.ano)[0]}: dinheiro federal desviado ou sem prestação de contas (valor da época, sem correção).</li>`);
-  if (d.leniencia) linhas.push(`<li><b>${curto(d.leniencia.total)}</b> ${d.leniencia.n} empresas, como ${[...new Set(d.leniencia.maiores.map(a => a[0]))].slice(0, 4).map(esc).join(", ")}, aceitaram devolver depois de admitir corrupção.</li>`);
+  if (d.tcu) linhas.push(`<li><b>${curto(d.tcu.total)}</b> de dinheiro federal sumiu na mão de quem cuidava dele, segundo condenações do Tribunal de Contas da União (TCU) desde ${Object.keys(d.tcu.ano)[0]}: desviado ou gasto sem provar onde (valor da época, sem correção).</li>`);
+  if (d.leniencia) linhas.push(`<li><b>${curto(d.leniencia.total)}</b> ${d.leniencia.n} empresas, como ${[...new Set(d.leniencia.maiores.map(a => a[0]))].slice(0, 4).map(esc).join(", ")}, admitiram corrupção e aceitaram pagar de volta.</li>`);
   if (d.campanha) linhas.push(`<li><b>${curto(d.campanha.fefc + d.campanha.fp)}</b> de dinheiro público pagou as campanhas de ${d.campanha.ano} (fundo eleitoral e partidário).</li>`);
+  if (d.empresas && d.empresas.total) linhas.push(`<li><b>${curto(d.empresas.total)}</b> de dinheiro público foi parar em empresas e entidades de ${fmt(d.empresas.pessoas)} políticos. <a href="#aba=emendas" data-ir-aba="emendas">Ver quem</a></li>`);
   if (d.emendas) linhas.push(`<li><b>${curto(d.emendas.total)}</b> deputados e senadores mandaram para cidades, entidades e empresas desde 2019. ${curto(d.emendas.pix)} disso caiu no caixa das prefeituras sem dizer em que vai ser gasto ("verba Pix").</li>`);
   $("#panorama").innerHTML = `<h2>Quanto dinheiro</h2><ul>${linhas.join("")}</ul><p class="pequena">De onde vem: decisões do TCU, acordos fechados pela Controladoria-Geral da União (CGU), contas de campanha entregues ao TSE e Portal da Transparência do governo. Veja as contas em Como funciona.</p>`;
   $("#panorama").hidden = false;
@@ -1055,7 +1093,7 @@ let cidadesIndex = null; // "maricá/rj" -> {nome, uf}
 
 function veredito(p) {
   const deb = somaDeb(p.k), conf = p.k.filter(k => CONF.has(k.s)), anal = p.k.filter(k => ANAL.has(k.s)).length;
-  if (deb) return ["ruim", `Condenado a devolver ${curto(deb)}`];
+  if (deb) return ["ruim", `Sumiu ${curto(deb)}`];
   if (conf.length) return ["ruim", conf.length === 1 ? conf[0].t + (conf[0].ano ? ` (${conf[0].ano})` : "") : `${conf.length} condenações`];
   if (anal) return ["atencao", `${anal} ${anal === 1 ? "caso" : "casos"} ainda com recurso`];
   if (!p.v) return ["neutro", "Só a Justiça Eleitoral foi checada"];
@@ -1138,7 +1176,7 @@ async function mostrarCidade(texto) {
       ${grupo("Prefeito", b.pref)}${grupo("Vice-prefeito", b.vice)}${grupo("Vereadores", b.ver, false)}
       ${(() => {
         const pq = PQ_cache && PQ_cache.cidades[`${cid.uf}|${normNome(cid.nome)}`];
-        return pq ? `<h3>Compras pagas a mais</h3><div class="dinheiro"><p>Órgãos da cidade pagaram <b>${curto(pq[0])}</b> a mais que o normal em <b>${pq[1]}</b> de ${pq[2]} compras comparadas (remédio, combustível, parquinho, ar-condicionado).</p><button type="button" class="botao" data-ver-parq="${esc(cid.nome)}">Ver as compras</button></div>` : "";
+        return pq ? `<h3>Compras com preço inflado</h3><div class="dinheiro"><p>Órgãos da cidade pagaram <b>${curto(pq[0])}</b> a mais que o normal em <b>${pq[1]}</b> de ${pq[2]} compras comparadas (remédio, combustível, parquinho, ar-condicionado).</p><button type="button" class="botao" data-ver-parq="${esc(cid.nome)}">Ver as compras</button></div>` : "";
       })()}
       ${blocoEmendasCidade(EMD_cache, cid.uf, cid.nome)}
     </section>
@@ -1188,14 +1226,67 @@ let COTA = null;
 const carregarCota = () => (COTA ??= fetch("cota.json").then(r => r.ok ? r.json() : null).catch(() => null));
 
 function blocoCota(d) {
-  return `<h3>Gastos do mandato que a Câmara pagou (${d.de} a ${d.ate})</h3>
-    <div class="valores num"><span>Total<br><b>${curto(d.t)}</b></span><span>Notas<br><b>${fmt(d.n)}</b></span><span class="pequena">Dinheiro público que o deputado gasta e a Câmara devolve: combustível, aluguel de carro, escritório, propaganda do mandato, consultoria. O nome oficial é "cota parlamentar".</span></div>
+  return `<h3>Gastos do mandato que ${d.casa || "a Câmara"} pagou (${d.de} a ${d.ate})</h3>
+    <div class="valores num"><span>Total<br><b>${curto(d.t)}</b></span><span>Notas<br><b>${fmt(d.n)}</b></span><span class="pequena">Dinheiro público que o político gasta e ${d.casa || "a Câmara"} devolve: combustível, aluguel de carro, escritório, propaganda do mandato, consultoria. O nome oficial é "cota parlamentar".</span></div>
     <p class="x"><b>Onde mais gastou:</b> ${d.cat.map(([c, v]) => `${esc(c.replace(/\.$/, ""))} (${curto(v)})`).join(", ")}.</p>
     <p class="x"><b>Quem mais recebeu:</b> ${d.forn.slice(0, 6).map(([f, v]) => `${esc(titulo(f))} (${curto(v)})`).join(", ")}.</p>
     ${d.al.map(a => `<div class="caso alerta"><div class="t"><b>${esc(titulo(a[0]))}</b><span class="chip s-final">Estava proibida de vender para o governo</span></div>
       <div class="x">Recebeu <b>${reais(a[1])}</b> dos gastos do mandato (${esc(a[2])}), quando estava proibida de vender para o governo: ${esc(a[3])} (${esc(a[4])}).</div>
       <div class="lk"><a href="${esc(a[5])}" target="_blank" rel="noopener">Prova: a punição</a>${a[6] ? `<a href="${esc(a[6])}" target="_blank" rel="noopener">Prova: uma das notas fiscais</a>` : ""}</div></div>`).join("")}`;
 }
+
+// ---------- empresas em que o político é sócio (Receita Federal) ----------
+const EMP = {};
+let EMPL = null;
+const carregarEmpresas = pd => (EMP[pd] ??= fetch(`empresas/${pd}.json`).then(r => r.ok ? r.json() : null).catch(() => null));
+const carregarListaEmpresas = () => (EMPL ??= fetch("empresas/lista.json").then(r => r.ok ? r.json() : null).catch(() => null));
+const dataBr = d => d ? d.split("-").reverse().join("/") : "";
+const mesBr = d => d.slice(5, 7) + "/" + d.slice(0, 4);
+const RECEITA = "https://arquivos.receitafederal.gov.br/index.php/s/YggdBLfdninEJX9";
+const ONDE = { cota: "Gastos do mandato", emenda: "Verba que a própria pessoa mandou", campanha: "Fundo eleitoral", prefeitura: "Compra da prefeitura", emenda_de: "Verba de outros políticos" };
+
+function pagamentoPropria([onde, forn, cnpj, v, de, ate, prova]) {
+  const [tipo, extra, cargo] = onde.split("|"), quando = mesBr(de) === mesBr(ate) ? mesBr(de) : `${mesBr(de)} a ${mesBr(ate)}`;
+  const texto = {
+    cota: `A cota do mandato pagou <b>${reais(v)}</b> a esta empresa (${quando}).`,
+    emenda: `Mandou <b>${reais(v)}</b> de verba do governo (emenda) para esta empresa ou entidade (${quando}).`,
+    emenda_de: `Esta empresa ou entidade recebeu <b>${reais(v)}</b> de verba do governo (emenda) mandada por <b>${esc(titulo(extra || ""))}</b> (${quando}).`,
+    campanha: `A campanha pagou <b>${reais(v)}</b> a esta empresa com fundo eleitoral ou partidário, que é dinheiro público (${quando}).`,
+    prefeitura: `A prefeitura de ${esc(extra)} comprou <b>${reais(v)}</b> desta empresa (${quando}), quando ocupava o cargo de ${esc((cargo || "").toLowerCase())} na cidade.`,
+  }[tipo];
+  return `<div class="caso alerta"><div class="t"><b>${esc(titulo(forn))}</b><span class="chip s-final">${ONDE[tipo]}</span></div>
+    <div class="x">${texto} Na data, a pessoa já aparecia no quadro de sócios e dirigentes da empresa no cadastro da Receita Federal.</div>
+    <div class="lk"><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: a empresa no Portal da Transparência</a>${/^https:\/\//.test(prova) ? `<a href="${esc(prova)}" target="_blank" rel="noopener">Prova: ${tipo === "cota" ? "a nota fiscal" : "a compra"}</a>` : ""}<a href="${RECEITA}" target="_blank" rel="noopener">Prova: quadro de sócios (Receita Federal)</a></div></div>`;
+}
+
+function blocoEmpresas(d, mes) {
+  const emp = ([cnpj, nome, papel, desde]) => `<div><b>${esc(nome || "Empresa sem nome no arquivo")}</b><span>${esc(papel)}${desde ? " desde " + dataBr(desde) : ""}</span><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: a empresa no governo</a></div>`;
+  return `${d.p.length ? `<h3>Dinheiro público que foi para empresas da pessoa (${reais(d.p.reduce((t, p) => t + p[3], 0))})</h3>${d.p.slice(0, 10).map(pagamentoPropria).join("")}
+    ${d.p.length > 10 ? `<details><summary>Ver os outros ${d.p.length - 10} pagamentos</summary>${d.p.slice(10).map(pagamentoPropria).join("")}</details>` : ""}` : ""}
+    <h3>Empresas em que é sócio(a) (${d.e.length})</h3>
+    <div class="cands">${d.e.slice(0, 20).map(emp).join("")}</div>
+    ${d.e.length > 20 ? `<details><summary>Ver as outras ${d.e.length - 20}</summary><div class="cands">${d.e.slice(20).map(emp).join("")}</div></details>` : ""}
+    <p class="pequena">Do cadastro de sócios da Receita Federal${mes ? ` (${mesBr(mes + "-01")})` : ""}. A ligação exige o nome completo igual e os 6 números do meio do CPF que a Receita divulga, então homônimo não entra. A Receita mostra só os sócios de hoje: quem saiu da empresa não aparece. Ser sócio de empresa não é crime.</p>`;
+}
+
+async function desenharEmpresasPropria() {
+  const l = await carregarListaEmpresas();
+  if (!l) { $("#presumo").textContent = "Ainda sem os dados da Receita."; return; }
+  const total = l.lista.reduce((t, x) => t + x[1], 0);
+  $("#presumo").innerHTML = `<b>${curto(total)}</b> de dinheiro público foi para empresas e entidades de <b>${fmt(l.lista.length)}</b> políticos, quando eles já apareciam como sócios ou dirigentes delas.`;
+  $("#ppropria").innerHTML = l.lista.slice(0, 200).map(([linha, v, ondes], i) => {
+    const [sq, urna, , cargo, uf, ue, , partido, , , ano] = linha;
+    return `<tr><td class="num">${i + 1}</td><td><a href="#" data-ficha-propria="${i}">${esc(titulo(urna))}</a></td><td>${esc(nomeCargo(cargo))}, ${esc(local([ano, cargo, uf, ue]))} (${ano})</td><td>${esc(partido)}</td><td class="r num">${curto(v)}</td><td>${ondes.map(o => ONDE[o]).join(", ")}</td></tr>`;
+  }).join("");
+}
+document.addEventListener("click", ev => {
+  const ir = ev.target.closest("[data-ir-aba]");
+  if (ir) { ev.preventDefault(); trocarAba(ir.dataset.irAba); scrollTo(0, 0); }
+  const a = ev.target.closest("[data-ficha-propria]");
+  if (!a || !EMPL) return;
+  ev.preventDefault();
+  EMPL.then(l => { const linha = l.lista[+a.dataset.fichaPropria][0]; if (!porId.has(linha[0])) pessoaDeLinha(linha); abrirFicha(linha[0]); });
+});
 
 function blocoEmendasAutor(e, cod) {
   const a = e.autores[cod];

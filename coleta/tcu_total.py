@@ -2,7 +2,9 @@
 
 Lê os mesmos CSVs de acórdãos do valores_tcu.py. Cada linha de tabela de débito conta uma vez por acórdão,
 então débito solidário (várias pessoas pelo mesmo dinheiro) não é somado duas vezes.
-Gera dados/tcu_total.json. Uso: python coleta/tcu_total.py
+Incremental: guarda o débito de cada acórdão em dados/tcu_acordaos.json e, nas próximas vezes, só lê o ano corrente
+e os anos que ganharam acórdão novo na lista do TCU. Gera dados/tcu_total.json.
+Uso: python coleta/tcu_total.py
 """
 import csv
 import html
@@ -17,6 +19,7 @@ import coletar  # noqa: E402
 import valores_tcu as v  # noqa: E402
 
 SAIDA = coletar.RAIZ / "dados" / "tcu_total.json"
+POR_ACORDAO = coletar.RAIZ / "dados" / "tcu_acordaos.json"
 
 
 def debito_do_acordao(texto):
@@ -51,13 +54,16 @@ def main():
         ac = x.get("numeroAcordaoFormatado")
         if ac and x.get("uf"):
             onde[ac][(x["uf"], coletar.norm_nome(x.get("municipio") or ""))] += 1
-    anos = sorted({int(ac.split("/")[1][:4]) for ac in onde})
-    por_ano, por_uf, por_cidade, achados = Counter(), Counter(), Counter(), {}
+    feitos = json.loads(POR_ACORDAO.read_text("utf-8")) if POR_ACORDAO.exists() else {}
+    corrente = max(int(ac.split("/")[1][:4]) for ac in onde)
+    anos = sorted({int(ac.split("/")[1][:4]) for ac in onde if ac not in feitos} | {corrente})
     for ano in anos:
         destino = coletar.CACHE / "acordaos" / f"ac{ano}.csv"
+        if ano == corrente:
+            destino.unlink(missing_ok=True)  # o ano corrente ganha acórdão novo todo dia
         try:
             coletar.baixar(v.URL.format(ano), f"acordaos/ac{ano}.csv")
-        except coletar.urllib.error.HTTPError:  # o TCU não publica alguns anos (1995, por exemplo)
+        except coletar.urllib.error.HTTPError:  # o TCU não publica alguns anos (1990, por exemplo)
             print(f"{ano}: sem arquivo no TCU", file=sys.stderr)
             continue
         with open(destino, encoding="utf-8", newline="") as f:
@@ -66,24 +72,25 @@ def main():
             for linha in leitor:
                 chave = (f"{linha[col['NUMACORDAO']]}/{linha[col['ANOACORDAO']]}-"
                          f"{v.COLEGIADO.get(linha[col['COLEGIADO']], linha[col['COLEGIADO']])}")
-                if chave not in onde or chave in achados:
-                    continue
-                if not linha[col["TIPO"]].startswith("ACÓRDÃO"):  # antes de 2003 há "Decisão" com o mesmo número
-                    continue
+                if chave not in onde or not linha[col["TIPO"]].startswith("ACÓRDÃO"):
+                    continue  # antes de 2003 há "Decisão" com o mesmo número
                 texto = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", linha[col["ACORDAO"]])))
                 deb, _ = debito_do_acordao(texto.translate(v.ASPAS_CP1252))
-                achados[chave] = deb
-                if not deb:
-                    continue
-                por_ano[int(linha[col["ANOACORDAO"]])] += deb
-                (uf, cidade), _ = onde[chave].most_common(1)[0]  # cidade da maioria dos responsáveis
-                por_uf[uf] += deb
-                if cidade:
-                    por_cidade[f"{uf}|{cidade}"] += deb
-        print(f"{ano}: {sum(1 for k in achados if f'/{ano}-' in k)} acórdãos, R$ {por_ano[ano] / 1e9:.2f} bi",
-              file=sys.stderr)
+                feitos[chave] = round(deb)
+        print(f"{ano}: lido", file=sys.stderr)
+    coletar.gravar_json(POR_ACORDAO, dict(sorted(feitos.items())))
+
+    por_ano, por_uf, por_cidade = Counter(), Counter(), Counter()
+    for ac, deb in feitos.items():
+        if not deb or ac not in onde:
+            continue
+        por_ano[int(ac.split("/")[1][:4])] += deb
+        (uf, cidade), _ = onde[ac].most_common(1)[0]  # cidade da maioria dos responsáveis
+        por_uf[uf] += deb
+        if cidade:
+            por_cidade[f"{uf}|{cidade}"] += deb
     dados = {
-        "total": round(sum(por_ano.values())), "acordaos": sum(1 for d in achados.values() if d),
+        "total": round(sum(por_ano.values())), "acordaos": sum(1 for ac, d in feitos.items() if d and ac in onde),
         "ano": {a: round(x) for a, x in sorted(por_ano.items())},
         "uf": {u: round(x) for u, x in por_uf.most_common()},
         "cidade": {c: round(x) for c, x in por_cidade.items()},

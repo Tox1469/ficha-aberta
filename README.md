@@ -8,7 +8,10 @@ O site cruza, pelo CPF, todos os candidatos do TSE com as listas oficiais de con
 - a ficha de cada um, com cada caso, em que pé está (decisão final, em recurso ou derrubado) e o link para a fonte;
 - a comparação entre partidos pela taxa por mil candidaturas, para não favorecer partido grande nem pequeno;
 - quem está no cargo hoje (eleitos de 2024, de 2022 e senadores de 2018);
-- quanto cada uma das 5.570 prefeituras gastou, por área, comparado com cidades do mesmo tamanho.
+- quanto cada uma das 5.570 prefeituras gastou, por área, comparado com cidades do mesmo tamanho;
+- compras públicas com preço muito acima do normal (parquinho, ar-condicionado, remédio, combustível);
+- para onde foi a verba que cada deputado e senador mandou (emendas) e o que gastou do mandato (cota);
+- as empresas em que cada político é sócio e o dinheiro público que foi para elas.
 
 Ninguém escreve nada à mão. As mesmas regras valem para todo mundo.
 
@@ -23,6 +26,12 @@ Ninguém escreve nada à mão. As mesmas regras valem para todo mundo.
 | CGU, CEIS | condenações por improbidade e outras sanções | CPF |
 | CGU, CEAF | servidores federais expulsos | nome completo + 6 dígitos do meio do CPF (o CPF vem mascarado) |
 | Tesouro Nacional, SICONFI (contas anuais DCA) | gasto da prefeitura por área, receita e royalties | código IBGE + nome da cidade |
+| Portal Nacional de Contratações Públicas (PNCP) | preço unitário de cada item comprado | cidade (prefeito da época) |
+| Portal da Transparência, emendas por favorecido | quem recebeu cada pagamento de emenda | nome parlamentar do autor |
+| Câmara e Senado, cota parlamentar | cada nota reembolsada | cadastro do deputado (CPF pela API) e nome completo + UF do senador |
+| TSE, prestação de contas de 2026 | quanto cada campanha recebeu e com quem gastou | pela candidatura |
+| Receita Federal, quadro de sócios do CNPJ (mensal) | empresas de cada político | nome completo + 6 dígitos do meio do CPF |
+| CGU, acordos de leniência; Banco Central, dívida bruta | números do país | não liga a pessoas |
 
 Em 2024 o TSE deixou de publicar o CPF dos candidatos. Quem concorreu em 2024 e também em 2020, 2022 ou 2026 é ligado pelo título de eleitor. O CPF nunca aparece no site.
 
@@ -35,14 +44,19 @@ Só precisa de Python 3.10+, sem dependências.
 ```bash
 python coleta/teste_valores.py # confere o extrator de valores com casos reais
 python coleta/valores_tcu.py   # lê os acórdãos do TCU (vários GB na primeira vez; depois só o ano corrente)
-python coleta/prefeituras.py   # contas das prefeituras no Tesouro (uma vez por ano; demora pelo limite da API)
-python coleta/coletar.py       # baixa TSE, TCU e CGU, cruza e gera site/dados.json
+python coleta/tcu_total.py     # total que o TCU mandou devolver, de todo mundo
+python coleta/precos.py        # compras no PNCP (incremental)
+python coleta/prefeituras.py   # contas das prefeituras no Tesouro (uma vez por mês; demora pelo limite da API)
+python coleta/empresas.py      # quadro de sócios da Receita (uma vez por mês; baixa uns 2 GB)
+python coleta/coletar.py       # baixa o resto, cruza tudo e gera os arquivos do site
 cd site && python -m http.server 8000
 ```
 
-Os downloads ficam em `coleta/cache/`. O `dados/valores_tcu.json` e o `dados/prefeituras.json` ficam no repositório porque mudam pouco (acórdão não muda; conta de prefeitura sai uma vez por ano).
+Os downloads ficam em `coleta/cache/`. O que é lento de refazer fica em `dados/` no repositório: valores dos acórdãos, compras já lidas, contas das prefeituras e empresas dos políticos (sem CPF: só o número da candidatura).
 
-Um GitHub Action roda os dois scripts todo dia e publica o site no GitHub Pages.
+GitHub Actions: `atualizar.yml` roda todo dia e publica no GitHub Pages; `prefeituras.yml` e `empresas.yml` rodam uma vez por mês.
+
+Nenhum CPF sai daqui: todo arquivo gravado passa por `gravar_json`, que apaga qualquer coisa com cara de CPF.
 
 ## Correções e casos novos
 

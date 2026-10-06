@@ -5,3 +5,4 @@ __pycache__/
 .playwright-mcp/
 site/todos/
 site/*.json
+site/empresas/

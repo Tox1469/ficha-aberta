@@ -28,16 +28,35 @@ def sem_acento(s):
 # ---------- como reconhecer e agrupar cada produto ----------
 
 def parquinho(desc, un):
+    """Só brinquedo avulso, separado por material e número de lugares. Parque montado (torres, módulos) e brinquedo
+    adaptado para cadeirante variam demais de tamanho e de preço: não dá para dizer qual é o normal, então fica de fora."""
     d = sem_acento(desc)
     if re.search(r"natal|ilumina|\bled\b|inflav|miniatura|pedagog|de mesa|boneco|fantasia", d) or \
-            re.search(r"^\W*(servico|manuten|reforma|pintura|locacao|aluguel|instala|projeto|recupera)", d):
+            re.search(r"^\W*(servico|manuten|reforma|pintura|locacao|aluguel|instala|projeto|recupera)", d) or \
+            re.search(r"torre|modular|modulo|multi|conjunto|playground|parque infantil|parquinho|\bkit\b|composto por"
+                      r"|acessib|cadeira de rodas|cadeirante|\bpcd\b|deficien|inclus|adaptad"
+                      r"|tematic|fibra de vidro|tarzan|escalada|combo|casinha|casa d|alimentacao|pikler|bebe", d):
         return None
-    for nome, rx in (("Parque infantil completo", r"parque infantil|playground|parquinho|conjunto de brinquedos"),
-                     ("Gangorra", r"\bgangorra"), ("Escorregador", r"escorregador|tobog"),
+    for nome, rx in (("Gangorra", r"\bgangorra"), ("Escorregador", r"escorregador|tobog"),
                      ("Gira-gira", r"gira[- ]?gira|carrossel"), ("Balanço", r"\bbalanco\b")):
         if re.search(rx, d):
-            return nome
-    return None
+            break
+    else:
+        return None
+    # na dúvida fica o material mais caro (estrutura de ferro com assento de plástico = de ferro): melhor deixar de
+    # marcar uma compra cara do que marcar errado uma barata
+    material = next((m for m, rx in (("de ferro", r"\baco\b|ferro|metal|tubo|tubular|galvaniz"),
+                                     ("de madeira", r"madeira|eucalipto"),
+                                     ("de plástico", r"plastic|polietileno|rotomold|polimer")) if re.search(rx, d)), None)
+    if not material:
+        return None  # sem material não dá para comparar: plástico custa uma fração do ferro
+    lugares = re.search(r"(\d+|duas|dois|tres|quatro|cinco|seis|sete|oito|dez)\s*(?:lugares|assentos|cadeiras|balancos|criancas)"
+                        r"|(duplo|triplo|quadruplo)", d)
+    if lugares:
+        n = lugares.group(1) or lugares.group(2)
+        n = int(n) if n.isdigit() else {"duas": 2, "dois": 2, "tres": 3, "quatro": 4, "cinco": 5, "seis": 6, "sete": 7,
+                                         "oito": 8, "dez": 10, "duplo": 2, "triplo": 3, "quadruplo": 4}[n]
+    return f"{nome} {material}" + (f", {n} lugares" if lugares else "")
 
 
 def combustivel(desc, un):
@@ -90,7 +109,10 @@ def ar_condicionado(desc, un):
     btus = int(m.group(1)) * 1000
     if btus not in (7000, 9000, 12000, 18000, 22000, 24000, 30000, 36000, 48000, 60000):
         return None
-    return f"Ar-condicionado de {btus // 1000} mil BTUs"
+    # piso-teto e cassete custam bem mais que o de parede: cada tipo tem o seu normal
+    tipo = next((t for t, rx in ((" piso-teto", r"piso[- ]?teto"), (" cassete", r"cassete|\bk7\b"), (" de janela", r"janela"),
+                                  (" portátil", r"portatil")) if re.search(rx, d)), "")
+    return f"Ar-condicionado{tipo} de {btus // 1000} mil BTUs"
 
 
 CATEGORIAS = {
@@ -187,9 +209,15 @@ def salvar(dados):
     coletar.gravar_json(SAIDA, dados)
 
 
+PRAZO_MINUTOS = 75  # o GitHub derruba a atualização inteira em 3 h: o que faltar fica para o dia seguinte
+
+
 def main():
     dados = json.loads(SAIDA.read_text("utf-8")) if SAIDA.exists() else {"lidas": {}, "itens": []}
+    fim = time.monotonic() + PRAZO_MINUTOS * 60
     for cat in sys.argv[1:] or list(CATEGORIAS):
+        if time.monotonic() > fim:
+            break
         lidas = set(dados["lidas"].get(cat, []))
         lista = compras(cat, lidas)
         print(f"[{cat}] {len(lista)} compras novas para ler", file=sys.stderr)
@@ -199,6 +227,10 @@ def main():
                 dados["itens"] += itens
                 lidas.add(chave)
                 feitos += 1
+                if time.monotonic() > fim:
+                    print(f"[{cat}] tempo esgotado em {feitos}/{len(lista)}: continua amanhã", file=sys.stderr)
+                    pool.shutdown(cancel_futures=True)
+                    break
                 if feitos % 100 == 0:
                     dados["lidas"][cat] = sorted(lidas)
                     salvar(dados)
