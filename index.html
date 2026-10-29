@@ -1,0 +1,1423 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha Aberta</title>
+<meta name="description" content="O que tribunais e órgãos de controle já registraram sobre quem se candidatou de 2018 a 2026, e quanto cada prefeitura gastou. Dados oficiais do TSE, TCU e CGU cruzados por CPF. Código aberto.">
+<meta property="og:title" content="Ficha Aberta">
+<meta property="og:description" content="O que tribunais e órgãos de controle já registraram sobre quem pede seu voto. Dados oficiais, código aberto.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181f'/%3E%3Cpath d='M9 8h11l3 3v13H9z' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Cpath d='M12 15h8M12 19h6' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --ink:#14181f; --ink2:#3a4250; --muted:#6b7280; --line:#e4e7ec; --line2:#d0d5dd;
+  --chip:#f2f4f7; --foco:#2d4a8a;
+  --final-bg:#14181f; --final-fg:#fff;
+  --sancao-bg:#475467; --sancao-fg:#fff;
+  --recurso-bg:#fef0c7; --recurso-fg:#93370d;
+  --revertido-bg:#dcfae6; --revertido-fg:#085d3a;
+  --outro-bg:#f2f4f7; --outro-fg:#475467;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--foco)}
+button,select,input{font:inherit;color:inherit}
+button,select,a,[role=button]{cursor:pointer}
+:focus-visible{outline:2px solid var(--foco);outline-offset:2px}
+.wrap{max-width:1400px;margin:0 auto;padding:0 24px}
+.num{font-variant-numeric:tabular-nums}
+
+header{background:var(--card);border-bottom:1px solid var(--line)}
+.topo{display:flex;align-items:center;gap:16px;padding:18px 0 0}
+.marca{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.marca b{font-size:20px;letter-spacing:-.02em}
+.topo .sub{color:var(--muted);font-size:14px;margin-left:auto;text-align:right}
+nav{display:flex;gap:4px;margin-top:14px}
+nav button{background:none;border:0;padding:10px 14px;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;white-space:nowrap}
+nav button[aria-selected=true]{color:var(--ink);border-color:var(--ink)}
+nav a{margin-left:auto;align-self:center;font-size:14px;color:var(--muted);text-decoration:none}
+nav a:hover{color:var(--ink)}
+
+.aviso{font-size:14px;color:var(--ink2);padding:14px 0 0}
+.aviso strong{color:var(--ink)}
+.titulo{font-size:22px;letter-spacing:-.01em;margin:4px 0 8px}
+
+.filtros{display:grid;grid-template-columns:2fr repeat(4,1fr) auto;gap:10px;padding:16px 0}
+.filtros .linha2{grid-column:1/-1;display:none;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}
+.filtros.mais .linha2{display:grid}
+.filtros{align-items:end}
+.mais-filtros{align-self:end}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+label.f input,label.f select{height:40px;border:1px solid var(--line2);border-radius:8px;background:var(--card);padding:0 10px;font-size:14px;font-weight:400;color:var(--ink);min-width:0}
+.periodo{display:flex;gap:6px}
+.periodo select{flex:1}
+.limpar{height:40px;border:1px solid var(--line2);background:var(--card);border-radius:8px;padding:0 14px;font-size:14px}
+.limpar:hover{background:var(--chip)}
+#abrirFiltros{display:none}
+
+.barra{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0 12px;font-size:14px;color:var(--ink2)}
+.barra select{height:36px;border:1px solid var(--line2);border-radius:8px;background:var(--card);padding:0 8px}
+
+.lista{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.cab,.item{display:grid;grid-template-columns:56px minmax(220px,2.2fr) minmax(200px,2fr) 120px 150px 90px minmax(160px,1.2fr);gap:16px;align-items:center;padding:12px 20px}
+.cab{font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line);background:#fafbfc}
+.item{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item:hover{background:#f9fafb}
+.pos{color:var(--muted);font-size:13px}
+.nome b{display:block;font-size:15px}
+.nome>span,.cand>span{display:block;font-size:13px;color:var(--muted)}
+.cand{font-size:14px}
+.partido{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.so-mob{display:none}
+.conta b{font-size:20px;line-height:1}
+.reais b{font-size:16px;line-height:1.2;white-space:nowrap}
+.reais span{display:block;font-size:12px;color:var(--muted)}
+.conta span{display:block;font-size:12px;color:var(--muted)}
+.extra{display:flex;flex-wrap:wrap;gap:6px}
+.vazio{padding:48px 20px;text-align:center;color:var(--muted)}
+.caso.alerta{border-left:4px solid #d92d20;background:#fff}
+#elista{margin-bottom:8px}
+.sub3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:24px 0 8px}
+.panorama{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:12px 0 0}
+.panorama h2{font-size:16px;margin:0 0 6px}
+.panorama ul{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--ink2)}
+.panorama li b{color:var(--ink);font-size:16px}
+.panorama ul{font-size:14px}
+.contadores{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.contador{display:flex;flex-direction:column;gap:2px;background:var(--ink);color:#fff;border-radius:14px;padding:14px 18px;min-width:0}
+.contador.vermelho{background:#7a271a}
+.contador .rot{font-size:13px;color:#e4e7ec}
+.contador>b{font-size:clamp(20px,3vw,32px);letter-spacing:-.02em;line-height:1.15;overflow-wrap:anywhere}
+.contador .pequena{color:#d0d5dd}
+.contador a{color:#fff}
+.contador.corrupcao{grid-column:1/-1;background:#4a1d0e}
+.contador .periodos{display:flex;flex-wrap:wrap;gap:6px 28px;margin:6px 0 4px;font-size:15px;color:#fff}
+.contador .periodos b{font-size:17px}
+.impostometro{display:flex;flex-direction:column;gap:4px;background:var(--ink);color:#fff;border-radius:16px;padding:20px 24px;margin:16px 0 0}
+.impostometro>span:first-child{font-size:14px;color:#d0d5dd}
+.impostometro>b{font-size:clamp(26px,6vw,44px);letter-spacing:-.02em;line-height:1.1}
+.impostometro .pequena{color:#d0d5dd}
+.impostometro.divida{background:#7a271a;margin-bottom:12px}
+.impostometro a{color:#fff}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;margin:16px 0}
+.hero h1{font-size:26px;letter-spacing:-.02em;margin:0 0 8px}
+.hero>p{color:var(--ink2);margin:0 0 16px;max-width:760px}
+.busca-cidade{display:flex;gap:10px;max-width:640px}
+.busca-cidade input{flex:1;min-width:0;height:54px;border:2px solid var(--line2);border-radius:12px;padding:0 16px;font-size:18px;background:#fff}
+.busca-cidade input:focus{border-color:var(--ink);outline:none}
+.busca-cidade button{height:54px;padding:0 26px;border:0;border-radius:12px;background:var(--ink);color:#fff;font-size:17px;font-weight:600}
+.bloco{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin-bottom:16px}
+.bloco h2{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.bloco h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:18px 0 8px;display:inline-flex;gap:8px;align-items:baseline}
+.bloco h3 .pequena{text-transform:none;letter-spacing:0;font-weight:400}
+.grupo summary{cursor:pointer;list-style:none}
+.grupo summary::-webkit-details-marker{display:none}
+.vertodos{display:inline-block;margin:8px 0;font-size:14px;font-weight:600;color:var(--foco)}
+.grupo[open] .vertodos{margin-bottom:8px}
+.cartoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.pessoa{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.pessoa:hover{border-color:var(--line2);background:#f9fafb}
+.pnome b{display:block;font-size:15px}
+.pnome span{font-size:13px;color:var(--muted)}
+.pill{flex:none;max-width:55%;font-size:12px;font-weight:600;padding:5px 9px;border-radius:999px;text-align:right}
+.pill.bom{background:#dcfae6;color:#085d3a}
+.pill.ruim{background:#fee4e2;color:#912018}
+.pill.atencao{background:#fef0c7;color:#93370d}
+.pill.neutro{background:#f2f4f7;color:#475467}
+.dinheiro{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;background:#f9fafb;border-radius:10px;padding:14px 16px;margin:12px 0 4px}
+.dinheiro p{margin:0;flex:1;min-width:260px}
+.botao{height:40px;padding:0 16px;border:1px solid var(--ink);background:#fff;border-radius:8px;font-weight:600}
+.pcab,.pitem{grid-template-columns:56px minmax(200px,1.5fr) minmax(170px,1.3fr) 190px minmax(260px,2.2fr)}
+.pfiltros{grid-template-columns:2fr 1fr 1fr 1.5fr}
+.areas{margin-top:4px}
+.areas tr.alto td{background:#fff4e5}
+.cands a{cursor:pointer}
+.mais{display:block;margin:16px auto 40px;height:42px;padding:0 22px;border:1px solid var(--line2);background:var(--card);border-radius:8px;font-weight:600}
+
+.chip{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--chip);color:var(--ink2)}
+.s-final{background:var(--final-bg);color:var(--final-fg)}
+.s-sancao{background:var(--sancao-bg);color:var(--sancao-fg)}
+.s-recurso,.s-andamento{background:var(--recurso-bg);color:var(--recurso-fg)}
+.s-revertido{background:var(--revertido-bg);color:var(--revertido-fg)}
+.s-outro{background:var(--outro-bg);color:var(--outro-fg)}
+
+/* partidos */
+.nota{font-size:14px;color:var(--ink2);margin:0 0 12px;max-width:900px}
+.ptab{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+.ptab th{font-size:12px;color:var(--muted);text-align:left;padding:10px 16px;background:#fafbfc;border-bottom:1px solid var(--line)}
+.ptab th button{background:none;border:0;padding:0;font-weight:600;color:inherit}
+.ptab th button[aria-pressed=true]{color:var(--ink)}
+.ptab td{padding:10px 16px;border-bottom:1px solid var(--line)}
+.ptab tr:last-child td{border-bottom:0}
+.ptab .r{text-align:right}
+.barraP{display:flex;align-items:center;gap:10px}
+.link-partido{background:none;border:0;padding:0;font-weight:700;color:var(--foco);text-decoration:underline;font-size:14px}
+.acima{color:#b42318}.abaixo{color:#067647}
+.barraP i{display:block;height:8px;border-radius:4px;background:var(--ink2);min-width:2px}
+.pequena{font-size:12px;color:var(--muted)}
+
+/* como funciona */
+.texto{max-width:860px;padding-bottom:60px}
+.texto h2{font-size:20px;margin:28px 0 8px}
+.texto p,.texto li{color:var(--ink2)}
+.texto dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:start}
+.texto dd{margin:0;color:var(--ink2)}
+
+/* ficha */
+dialog{border:0;border-radius:14px;padding:0;width:min(860px,calc(100vw - 32px));max-height:calc(100vh - 48px);box-shadow:0 20px 60px rgba(16,24,40,.25)}
+dialog::backdrop{background:rgba(16,24,40,.45)}
+.fcab{position:sticky;top:0;background:var(--card);padding:20px 24px 14px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:flex-start;z-index:1}
+.fcab h2{margin:0;font-size:22px;letter-spacing:-.01em}
+.fcab p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.fechar{margin-left:auto;border:1px solid var(--line2);background:var(--card);border-radius:8px;width:36px;height:36px;font-size:20px;line-height:1;flex:none}
+.fcorpo{padding:16px 24px 24px}
+.fcorpo h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:20px 0 8px}
+.cands{display:grid;gap:6px}
+.cands div{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:8px}
+.cands a{margin-left:auto;font-size:13px}
+.caso{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.caso .t{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.caso .t b{font-size:15px;margin-right:auto}
+.caso .meta{font-size:13px;color:var(--muted);margin-top:4px}
+.caso ul{margin:8px 0 0;padding-left:18px;font-size:14px;color:var(--ink2)}
+.caso .x{font-size:13px;color:var(--ink2);margin-top:8px}
+.caso .lk{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:14px}
+.valores{display:flex;flex-wrap:wrap;gap:6px 24px;margin-top:10px;padding:10px 12px;background:#f9fafb;border-radius:8px;font-size:14px}
+.valores b{font-size:16px}
+.comofaz{margin:-4px 0 14px}.comofaz summary{cursor:pointer;color:var(--foco);font-size:14px}
+.caso details{margin-top:8px;font-size:13px;color:var(--ink2)}
+.caso summary{color:var(--foco)}
+.totais{display:flex;flex-wrap:wrap;gap:4px 24px;font-size:14px;color:var(--ink2);margin-top:12px}
+.totais b{color:var(--ink);font-size:18px}
+.rodapeF{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;padding:20px 0 40px}
+[hidden]{display:none!important}
+
+@media (max-width:1100px){
+  .filtros{grid-template-columns:repeat(3,1fr)}
+  .filtros .linha2{grid-template-columns:repeat(2,1fr)}
+  .filtros .linha2{grid-template-columns:repeat(2,1fr)}
+  .cab{display:none}
+  .item{grid-template-columns:40px 1fr auto;grid-template-areas:"pos nome reais" "pos cand conta" "pos extra extra";gap:6px 12px;padding:14px 16px}
+  .pos{grid-area:pos;align-self:start;padding-top:2px}.nome{grid-area:nome}.cand{grid-area:cand}.conta{grid-area:conta;text-align:right}.reais{grid-area:reais;text-align:right}
+  .partido{display:none}.extra{grid-area:extra}.so-mob{display:inline}
+}
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .topo .sub{display:none}
+  nav{overflow-x:auto;scrollbar-width:none}nav::-webkit-scrollbar{display:none}
+  nav button{padding:10px 10px}
+  nav a{display:none}
+  #abrirFiltros{display:flex;align-items:center;justify-content:center;width:100%;height:42px;margin:14px 0 0;border:1px solid var(--line2);background:var(--card);border-radius:8px;font-weight:600}
+  .filtros{grid-template-columns:1fr 1fr}
+  .filtros.fechado>:not(.sempre){display:none}
+  .filtros .sempre{grid-column:1/-1}
+  .filtros .linha2{grid-template-columns:1fr 1fr}
+  label.f{min-width:0}
+  .pfiltros>label.f:first-child{grid-column:1/-1}
+  .barra{flex-direction:column;align-items:stretch}
+  .contadores{grid-template-columns:1fr}
+  .mais-filtros{grid-column:1/-1}
+  .barra label{display:flex;align-items:center;gap:8px}.barra label select{flex:1}
+  .ptab th:nth-child(2),.ptab td:nth-child(2),.ptab th:nth-child(3),.ptab td:nth-child(3),.ptab th:nth-child(4),.ptab td:nth-child(4){display:none}
+  .ptab td,.ptab th{padding:10px}
+  dialog{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;margin:0}
+  .hero{padding:20px 16px}.hero h1{font-size:22px}
+  .busca-cidade input{height:50px;font-size:17px}.busca-cidade button{padding:0 18px}
+  .bloco{padding:16px}.cartoes{grid-template-columns:1fr}
+  .pessoa{flex-direction:column;align-items:flex-start}.pill{max-width:100%;text-align:left}
+  .fcab,.fcorpo{padding-left:16px;padding-right:16px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="topo">
+      <a class="marca" href="./">
+        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#14181f"/><path d="M9 8h11l3 3v13H9z" fill="none" stroke="#fff" stroke-width="2"/><path d="M12 15h8M12 19h6" stroke="#fff" stroke-width="2"/></svg>
+        <b>Ficha Aberta</b>
+      </a>
+      <div class="sub">Todos os candidatos de 2018 a 2026, do presidente ao vereador,<br>e o que tribunais e órgãos de controle já registraram sobre eles</div>
+    </div>
+    <nav role="tablist">
+      <button role="tab" data-aba="candidatos" aria-selected="true">Ranking</button>
+      <button role="tab" data-aba="parquinhos" aria-selected="false">Preço inflado</button>
+      <button role="tab" data-aba="partidos" aria-selected="false">Partidos</button>
+      <button role="tab" data-aba="inicio" aria-selected="false">Sua cidade</button>
+      <button role="tab" data-aba="prefeituras" aria-selected="false">Prefeituras</button>
+      <button role="tab" data-aba="emendas" aria-selected="false">Verba dos políticos</button>
+      <button role="tab" data-aba="como" aria-selected="false">Como funciona</button>
+      <a href="https://github.com/Tox1469/ficha-aberta" target="_blank" rel="noopener">Código aberto no GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="topoDinheiro">
+    <div class="contadores">
+      <div class="contador vermelho" id="divida" hidden>
+        <span class="rot">Dívida do governo agora</span>
+        <b id="dividaValor" class="num">R$ …</b>
+        <span class="pequena" id="dividaNota"></span>
+      </div>
+      <div class="contador">
+        <span class="rot">Impostos pagos em <span id="impAno">2026</span>, até agora</span>
+        <b id="impostos" class="num">R$ …</b>
+        <span class="pequena">R$ 131 mil por segundo. Estimativa com o total de 2025 do <a href="https://www.tesourotransparente.gov.br/publicacoes/carga-tributaria-do-governo-geral/2025/114" target="_blank" rel="noopener">Tesouro Nacional</a> (R$ 4,13 trilhões).</span>
+      </div>
+      <div class="contador corrupcao" id="corrupcao" hidden>
+        <span class="rot">Corrupção estimada em <span id="corAno">2026</span>, até agora</span>
+        <b id="corValor" class="num">R$ …</b>
+        <div class="periodos num" id="corPeriodos"></div>
+        <span class="pequena" id="corNota"></span>
+      </div>
+    </div>
+    <div class="panorama" id="panorama" hidden></div>
+  </div>
+  <p class="aviso">O site não acusa ninguém: só junta <b>dados oficiais</b> e mostra a <b>prova</b> de cada número, com o link para o documento original.</p>
+
+  <button id="abrirFiltros" type="button" aria-expanded="false" hidden>Filtros</button>
+  <form class="filtros fechado" id="filtros" onsubmit="return false" hidden>
+    <label class="f sempre">Buscar nome<input type="search" name="q" placeholder="Nome ou nome de urna" autocomplete="off"></label>
+    <label class="f">Eleição<select name="ano"></select></label>
+    <label class="f">Estado<select name="uf"></select></label>
+    <label class="f">Partido<select name="partido"></select></label>
+    <label class="f" id="filtroMostrar">Mostrar<select name="mostrar">
+      <option value="todos">Todos os candidatos</option>
+      <option value="nocargo">Só quem está no cargo hoje</option>
+      <option value="registro">Só quem tem registro</option>
+    </select></label>
+    <button class="limpar mais-filtros" type="button" id="maisFiltros" aria-expanded="false">Mais filtros</button>
+    <div class="linha2">
+      <label class="f">Cargo<select name="cargo"></select></label>
+      <label class="f">Resultado<select name="sit"></select></label>
+      <label class="f" id="filtroMun" style="visibility:hidden">Município<select name="mun"><option value="">Todos</option></select></label>
+      <label class="f" id="filtroSt">Situação<select name="st">
+        <option value="ativos">Condenações e casos com recurso</option>
+        <option value="conf">Só condenações</option>
+        <option value="anal">Só casos que ainda cabem recurso</option>
+        <option value="rev">Acusações derrubadas</option>
+        <option value="todos">Tudo</option>
+      </select></label>
+      <label class="f">Fonte<select name="fonte"></select></label>
+      <label class="f">Ano da decisão<span class="periodo"><select name="de" aria-label="De"></select><select name="ate" aria-label="Até"></select></span></label>
+      <button class="limpar" type="button" id="limpar">Limpar filtros</button>
+    </div>
+  </form>
+
+  <section id="aba-inicio" hidden>
+    <div class="hero">
+      <h1>Quem manda na sua cidade, e o que já pesa contra cada um</h1>
+      <p>Digite sua cidade. Aparecem o prefeito, os vereadores, o governador, os senadores e os deputados do seu estado, e o que a Justiça e os tribunais de contas já registraram sobre cada um.</p>
+      <form id="buscaCidade" class="busca-cidade" onsubmit="return false">
+        <input id="cidade" list="listaCidades" placeholder="Sua cidade (ex.: Maricá)" autocomplete="off" aria-label="Sua cidade">
+        <button type="submit">Ver</button>
+      </form>
+      <datalist id="listaCidades"></datalist>
+      <p class="pequena">Quer procurar um político pelo nome? <a href="#" data-ir="candidatos">Clique aqui</a>.</p>
+    </div>
+    <div id="resultadoCidade"><p class="pequena">Carregando…</p></div>
+  </section>
+
+  <section id="aba-candidatos">
+    <h1 class="titulo">Na mão de quem mais sumiu dinheiro público</h1>
+    <div class="barra">
+      <span id="total" class="num">Carregando dados…</span>
+      <label>Ordenar por <select id="ordem">
+        <option value="deb">Mais dinheiro sumido</option>
+        <option value="conf">Mais condenações</option>
+        <option value="camp">Mais dinheiro público de campanha (2026)</option>
+        <option value="cargo">Cargo (do presidente ao vereador)</option>
+        <option value="rec">Caso mais recente</option>
+        <option value="nome">Nome (A a Z)</option>
+      </select></label>
+    </div>
+    <div class="lista" id="lista"></div>
+    <button class="mais" id="mais" type="button" hidden>Mostrar mais</button>
+  </section>
+
+  <section id="aba-parquinhos" hidden>
+    <h1 class="titulo">Compras com preço inflado</h1>
+    <p class="nota"><b>Preço inflado é o jeito mais comum de desviar dinheiro em compra pública:</b> a prefeitura paga caro, a empresa embolsa a diferença. Aqui cada compra é comparada com o <b>preço normal do mesmo produto</b>, o preço do meio que os outros órgãos pagaram, e aparece toda compra que pagou o dobro ou mais. Nem todo preço alto é roubo: cada caso tem a descrição e a prova para conferir.</p>
+    <details class="comofaz"><summary>Como a comparação é feita</summary><p class="pequena">Aqui cada compra é comparada com o <b>preço normal do mesmo produto</b>, o preço do meio que os outros órgãos pagaram (dipirona 500 mg com dipirona 500 mg, ar-condicionado de parede de 12 mil BTUs com o mesmo tipo, gangorra de ferro de 3 lugares com gangorra de ferro de 3 lugares, gasolina com gasolina do mesmo estado). Aparece toda compra que pagou o dobro ou mais. Parque montado (com torres, módulos ou brinquedão) e brinquedo adaptado ficam de fora, porque variam demais para ter um preço normal. Combustível lançado como lote inteiro, sem o preço do litro, também fica de fora. Além dessas buscas, <b>tudo o que passa pelo Compras.gov.br</b> (governo federal, estados e as prefeituras que usam o sistema) é comparado pelo catálogo oficial de produtos do governo: mesmo código de produto e mesma embalagem (caixa com 100 só com caixa com 100). Só vale quando pelo menos 15 compras de 8 órgãos diferentes dizem qual é o preço normal e a maioria paga parecido. O normal é o da região (Norte, Nordeste...) quando ela tem compras bastantes, porque frete pesa. Ficam de fora: produto descrito só pelo nome ("Notebook" pode ser de R$ 3 mil ou de R$ 15 mil), fruta, legume e verdura (mudam de preço com a safra) e compra acima de 5 vezes o normal, que no catálogo é quase sempre a embalagem errada (o preço da caixa com 10 lançado como se fosse de 1). Nem todo preço alto é roubo (às vezes o produto é de outra marca ou vem com instalação), por isso cada caso tem a descrição e a prova para conferir. Quando a compra é um registro de preço, a quantidade é o máximo que a prefeitura pode comprar, então o valor pago a mais pode ser menor.</p></details>
+    <p class="x" id="qresumo">Carregando…</p>
+    <form class="filtros pfiltros" id="qfiltros" onsubmit="return false">
+      <label class="f">Buscar cidade ou produto<input type="search" name="q" placeholder="Ex.: Recife, dipirona, pneu" autocomplete="off"></label>
+      <label class="f">Estado<select name="uf"><option value="">Todos</option></select></label>
+      <label class="f">O que foi comprado<select name="cat"><option value="">Tudo</option></select></label>
+    </form>
+    <div id="qlista"></div>
+    <button class="mais" id="qmais" type="button" hidden>Mostrar mais</button>
+  </section>
+  <section id="aba-partidos" hidden>
+    <p class="nota">Partido grande tem mais candidato, então sempre teria mais caso. Por isso cada partido é comparado com o <b>normal pro tamanho dele</b>: quanto teria se o dinheiro que sumiu (condenações do TCU) fosse dividido pelo número de candidatos. "2 vezes o normal" quer dizer o dobro do esperado pelo tamanho. <b>Clique no nome do partido</b> para ver todo mundo dele com condenação, do maior valor para o menor. Os filtros de cima também valem aqui. O partido é o da candidatura, não o atual.</p>
+    <table class="ptab">
+      <thead><tr>
+        <th>Partido</th>
+        <th class="r">Candidatos checados</th>
+        <th class="r"><button type="button" data-po="num" aria-pressed="false">Já condenados</button></th>
+        <th><button type="button" data-po="taxa" aria-pressed="false">Condenados a cada mil</button></th>
+        <th class="r"><button type="button" data-po="val" aria-pressed="false">Dinheiro que sumiu</button></th>
+        <th class="r">Normal pro tamanho</th>
+        <th class="r"><button type="button" data-po="razao" aria-pressed="true">Comparado ao normal</button></th>
+      </tr></thead>
+      <tbody id="ptab"></tbody>
+    </table>
+    <p class="pequena">Partidos com menos de 300 candidatos checados ficam no fim da tabela: com tão pouca gente, um caso a mais ou a menos muda muito a conta.</p>
+  </section>
+
+  <section id="aba-prefeituras" hidden>
+    <h1 class="titulo">Quanto cada prefeitura gastou</h1>
+    <p class="nota">Contas de 2025 que cada prefeitura entregou ao Tesouro Nacional, comparadas com cidades do mesmo tamanho. <b>Gastar muito não prova desvio:</b> cidade com royalties de petróleo, minério ou usina recebe muito e gasta muito. O que chama atenção é gastar bem mais que cidades parecidas, principalmente com <b>Administração</b> (a máquina da prefeitura) e com a <b>Câmara de Vereadores</b>.</p>
+    <form class="filtros pfiltros" id="pfiltros" onsubmit="return false">
+      <label class="f">Buscar cidade<input type="search" name="q" placeholder="Nome da cidade" autocomplete="off"></label>
+      <label class="f">Estado<select name="uf"></select></label>
+      <label class="f">Tamanho da cidade<select name="porte"></select></label>
+      <label class="f">Ordenar por<select name="ordem">
+        <option value="razao">Gasto por morador acima do normal</option>
+        <option value="adm">Administração acima do normal</option>
+        <option value="cam">Câmara de Vereadores acima do normal</option>
+        <option value="hab">Maior gasto por morador</option>
+        <option value="total">Maior gasto total</option>
+      </select></label>
+    </form>
+    <div class="barra"><span id="ptotal" class="num">Carregando contas das prefeituras…</span></div>
+    <div class="lista" id="plista"></div>
+    <button class="mais" id="pmais" type="button" hidden>Mostrar mais</button>
+  </section>
+
+  <section id="aba-emendas" hidden>
+    <h1 class="titulo">Verba que os políticos mandam</h1>
+    <p class="nota">Todo ano cada deputado e senador escolhe para onde vai uma parte do dinheiro do governo federal: qual cidade, qual entidade, às vezes direto para uma empresa. O nome oficial disso é "emenda parlamentar". Aqui está o que foi pago desde 2019 e para quem, segundo o Portal da Transparência do governo.</p>
+    <h3 class="sub3">Dinheiro público que foi para empresas de políticos</h3>
+    <p class="x" id="presumo">Carregando…</p>
+    <table class="ptab"><thead><tr><th>#</th><th>Político</th><th>Cargo</th><th>Partido</th><th class="r">Valor</th><th>Por onde</th></tr></thead><tbody id="ppropria"></tbody></table>
+    <p class="pequena">Cruza o cadastro de sócios e dirigentes da Receita Federal com verbas (emendas), gastos do mandato (cota), o fundo eleitoral de 2026 e compras das prefeituras. Entra a verba que o próprio político mandou para a empresa dele e a verba que outros mandaram para empresa de quem já foi eleito. Só conta pagamento feito quando a pessoa já estava na empresa. Estatais ficam de fora. Clique no nome para ver cada pagamento e a prova.</p>
+    <h3 class="sub3">Verba para associações, fundações e cooperativas dirigidas por políticos</h3>
+    <p class="x" id="dresumo">Carregando…</p>
+    <div id="dlista"></div>
+    <p class="pequena">Aqui não tem dono: o político aparece no cadastro da Receita Federal como presidente, diretor ou conselheiro da entidade. Muitas são hospitais filantrópicos e Santa Casas, e receber verba não prova nada errado. Por isso fica separado das empresas. Só conta verba paga quando a pessoa já dirigia a entidade.</p>
+    <h3 class="sub3">Verba paga a empresas e entidades que estavam proibidas de vender para o governo</h3>
+    <p class="x" id="eresumo">Carregando…</p>
+    <div id="elista"></div>
+    <h3 class="sub3">Quem mais mandou verba</h3>
+    <table class="ptab"><thead><tr><th>#</th><th>Parlamentar</th><th class="r">Pago</th><th class="r">Verba Pix</th><th>Para onde mais foi</th></tr></thead><tbody id="eautores"></tbody></table>
+    <p class="pequena">Verba Pix é o dinheiro que cai direto no caixa da prefeitura ou do estado, sem dizer em que vai ser gasto. Pagamento a órgão ou empresa com sede em Brasília aparece como Brasília. Verba mandada em grupo (pela bancada do estado, por uma comissão ou pelo relator do orçamento) não tem um dono só e fica de fora desta lista.</p>
+  </section>
+  <section id="aba-como" class="texto" hidden>
+    <h2>O que é</h2>
+    <p>Um site que junta, num lugar só, o que os órgãos oficiais já registraram sobre cada pessoa que se candidatou em 2018, 2020, 2022, 2024 ou 2026. O computador cruza as listas pelo CPF. Ninguém escreve nada à mão: o que aparece é o que o órgão publicou, sempre com o link para você conferir.</p>
+
+    <h2>De onde vêm os dados</h2>
+    <ul id="fontes"></ul>
+    <p>Dados atualizados em <b id="gerado"></b>. Tudo roda de novo todo dia.</p>
+    <ul>
+      <li><b>TSE</b> (Tribunal Superior Eleitoral): lista de candidatos e candidaturas barradas ou cassadas.</li>
+      <li><b>TCU</b> (Tribunal de Contas da União): o tribunal que confere se o dinheiro federal mandado para prefeituras, estados e órgãos foi bem usado.</li>
+      <li><b>CGU</b> (Controladoria-Geral da União): cadastros de quem foi condenado por improbidade e de servidores expulsos do governo federal.</li>
+    </ul>
+
+    <h2>O que cada situação quer dizer</h2>
+    <dl>
+      <dt><span class="chip s-final">Decisão final</span></dt><dd>Não dá mais para recorrer. É uma condenação definitiva.</dd>
+      <dt><span class="chip s-sancao">Punição aplicada</span></dt><dd>A punição está no cadastro oficial, mas o órgão não informou se ainda cabe recurso. Conta como condenação.</dd>
+      <dt><span class="chip s-recurso">Ainda cabe recurso</span></dt><dd>Já houve decisão contra a pessoa, mas ela recorreu e o caso pode mudar. Aparece separado e não conta como condenação.</dd>
+      <dt><span class="chip s-revertido">Acusação derrubada</span></dt><dd>A acusação não se manteve: a pessoa ganhou no recurso. Aparece na ficha por transparência, mas não conta no ranking.</dd>
+    </dl>
+
+    <h2>Tipos de caso</h2>
+    <ul>
+      <li><b>Dinheiro público que sumiu:</b> a pessoa cuidou de dinheiro federal (um convênio, uma obra, um repasse para a prefeitura) e o Tribunal de Contas da União (TCU) concluiu que o dinheiro foi desviado, mal usado ou gasto sem provar onde, e condenou a pessoa a pagar de volta. Ser condenado a pagar não quer dizer que pagou. Pode ser desvio, superfaturamento, obra não entregue ou simplesmente não ter prestado contas: a decisão completa está no link.</li>
+      <li><b>Contas reprovadas ou multado pelo TCU:</b> o TCU reprovou as contas, mas não apontou dinheiro sumido (às vezes só aplicou multa).</li>
+      <li><b>Proibido pelo TCU de ocupar cargo de confiança:</b> punição para irregularidades graves.</li>
+      <li><b>Condenado na Justiça por improbidade:</b> condenação por usar o cargo de forma desonesta ou causar prejuízo aos cofres públicos (Lei de Improbidade).</li>
+      <li><b>Servidor punido:</b> demitido, destituído ou que perdeu a aposentadoria no governo federal.</li>
+      <li><b>Justiça Eleitoral:</b> candidatura barrada pela Lei da Ficha Limpa, ou cassada por compra de voto, abuso de poder, dinheiro ilegal na campanha ou uso do cargo público a favor da campanha. Motivos só de papelada (documento faltando) ficam de fora. A fraude na cota de mulheres também fica de fora, porque cassa a chapa inteira do partido de uma vez, inclusive quem não teve nada a ver.</li>
+    </ul>
+
+    <h2>De onde vêm os valores em reais</h2>
+    <p>O TCU publica o texto de todas as suas decisões. Para cada condenação de um candidato, o site lê a decisão e soma o dinheiro que sumiu (o que o tribunal condenou a pessoa a pagar de volta) e, separado, a multa. O que ela já tinha pagado de volta é descontado.</p>
+    <ul>
+      <li><b>É o valor da época:</b> o número que está na decisão, sem correção nem juros. A dívida de hoje é maior.</li>
+      <li><b>Dívida em conjunto:</b> quando o TCU condena duas ou mais pessoas (ou uma empresa) pelo mesmo dinheiro, cada uma pode ser cobrada pelo valor todo. Por isso o valor inteiro aparece para cada uma, e a soma do topo pode contar o mesmo dinheiro mais de uma vez.</li>
+      <li><b>Sumiu não quer dizer roubo provado.</b> Em parte dos casos a pessoa não prestou contas e a decisão não diz se o dinheiro foi desviado: só que ela não provou onde ele foi parar. O TCU julga contas, não crimes.</li>
+      <li>Antes de 1994 a moeda era outra (cruzeiro). Esses valores não entram na soma; a ficha avisa e mostra o trecho.</li>
+      <li>A leitura é automática. A ficha mostra o trecho da decisão de onde saiu o número, para qualquer um conferir.</li>
+    </ul>
+
+    <h2>Emendas, cota parlamentar e bens</h2>
+    <ul>
+      <li><b>Emendas:</b> dinheiro do orçamento federal que cada deputado e senador escolhe para onde vai. Vem do Portal da Transparência, com quem recebeu cada pagamento desde 2019. O autor é ligado ao candidato pelo nome parlamentar; se houver dois com o mesmo nome, não liga.</li>
+      <li><b>Cota parlamentar:</b> notas que cada deputado federal apresentou à Câmara para ser reembolsado (combustível, carro, escritório, divulgação). Ligada pelo cadastro oficial do deputado.</li>
+      <li><b>Pago a quem estava proibido de contratar:</b> o site cruza quem recebeu emenda ou cota com o cadastro de punidos da CGU (CEIS). Só conta a declaração de inidoneidade (vale para qualquer governo) e o impedimento ou a suspensão dados por órgão federal, e só se o pagamento foi depois do mês em que a punição começou. O pagamento pode ser de contrato assinado antes da punição, que a lei permite manter.</li>
+      <li><b>Bens:</b> o que cada candidato declarou ao TSE em cada eleição, pelo valor que ele mesmo digitou. Tem erro de digitação na base do TSE.</li>
+      <li><b>Empresas dos políticos:</b> vêm do cadastro de sócios que a Receita Federal publica todo mês. A Receita mostra o nome do sócio e só os 6 números do meio do CPF; o site liga ao candidato quando o nome completo e esses 6 números batem. O CPF serve só para essa ligação e não aparece no site.</li>
+      <li><b>Dinheiro público para empresa de político:</b> nota da cota do mandato, verba (emenda) mandada pelo próprio parlamentar, gasto da campanha de 2026 pago com fundo eleitoral ou partidário, ou compra da prefeitura onde a pessoa era prefeito, vice ou vereador, pago a empresa da qual ela já era sócia ou dirigente na data. Também entra a verba mandada por outros políticos para empresa de quem já foi eleito. Só conta empresa privada, que tem dono: estatal (como Infraero e Dataprev), cooperativa, associação, fundação e hospital filantrópico (Santa Casa) ficam de fora, porque presidente ou diretor dessas entidades não fica com o dinheiro que elas recebem. A Receita só mostra o quadro atual, então quem já saiu da empresa fica de fora. As compras de prefeitura são só as que o site já lê do Portal Nacional de Contratações (as mesmas da aba Preço inflado). Receber verba não prova nada errado: a ficha mostra o pagamento e a prova para cada um conferir.</li>
+    </ul>
+
+    <h2>Prefeituras</h2>
+    <p>A aba Prefeituras usa as contas anuais que cada prefeitura é obrigada a entregar ao Tesouro Nacional (SICONFI). Para cada cidade aparece quanto ela gastou, quanto isso dá por morador e em que áreas. O "normal" é o gasto por morador da cidade do meio (a mediana) entre as cidades do mesmo tamanho.</p>
+    <ul>
+      <li>Gastar muito não prova desvio. Cidade com royalties de petróleo, minério ou usina recebe muito dinheiro e gasta muito: a ficha mostra quanto veio de royalties.</li>
+      <li>O que vale olhar com atenção é gasto muito acima do normal em Administração (a máquina da prefeitura: salários, aluguel, contratos de apoio) e na Câmara de Vereadores.</li>
+      <li>O prefeito e os vereadores que aparecem são os eleitos em 2024. Quem assumiu depois (por cassação ou morte) ainda não aparece.</li>
+    </ul>
+
+    <h2>Regras para não favorecer ninguém</h2>
+    <ul>
+      <li>As mesmas regras valem para todos os partidos e todos os candidatos. Não existe lista feita à mão.</li>
+      <li>O cruzamento é pelo CPF, então ninguém é confundido com outra pessoa de mesmo nome. No cadastro de servidores, onde o CPF vem escondido em parte, a ligação exige o nome completo igual e os seis números do meio do CPF.</li>
+      <li>O ranking conta só condenações. O que ainda cabe recurso aparece separado e o que foi derrubado não conta.</li>
+      <li>Na comparação entre partidos vale a conta "a cada mil candidatos", não o total, porque partido grande sempre teria mais.</li>
+      <li>O CPF de ninguém aparece no site.</li>
+    </ul>
+
+    <h2>O que ainda não entra</h2>
+    <ul>
+      <li>O TCU só julga dinheiro federal. Dinheiro do estado e da prefeitura é com os tribunais de contas estaduais, que ainda não entraram.</li>
+      <li>Em 2024 o TSE parou de divulgar o CPF dos candidatos. Só dá para checar quem também concorreu em 2018, 2020, 2022 ou 2026. Os casos da Justiça Eleitoral de 2024 aparecem para todo mundo.</li>
+      <li>Só o TCU informa valor em reais. Condenações por improbidade e da Justiça Eleitoral aparecem sem valor.</li>
+      <li>Processos criminais e investigações ainda sem decisão não entram, porque não existe lista pública com CPF para eles.</li>
+      <li>Por isso, "nenhum registro" quer dizer "nada nessas listas", e não "ficha limpa garantida".</li>
+    </ul>
+
+    <h2>Achou um erro?</h2>
+    <p>Abra um pedido de correção no <a href="https://github.com/Tox1469/ficha-aberta/issues" target="_blank" rel="noopener">GitHub</a> com o link da fonte oficial. Casos de outras fontes também podem ser enviados, desde que tenham número de processo e link para a decisão.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">Ficha Aberta. Código aberto (licença MIT), dados públicos. Não é afiliado a nenhum partido, candidato ou órgão público.</div></footer>
+
+<dialog id="ficha" aria-labelledby="fnome"></dialog>
+
+<script>
+const STATUS = {
+  final: "Decisão final", sancao: "Punição aplicada", recurso: "Ainda cabe recurso",
+  andamento: "Em andamento", revertido: "Acusação derrubada", outro: "Sem conclusão",
+};
+const FONTE = { TCU: "Tribunal de Contas (TCU)", TSE: "Justiça Eleitoral", CEIS: "Justiça e órgãos do governo (CGU)", CEAF: "Servidor punido (CGU)", Comunidade: "Comunidade" };
+const CONF = new Set(["final", "sancao"]), ANAL = new Set(["recurso", "andamento"]);
+const FILTRO_ST = {
+  ativos: s => CONF.has(s) || ANAL.has(s), conf: s => CONF.has(s), anal: s => ANAL.has(s),
+  rev: s => s === "revertido", todos: () => true,
+};
+const UFS = {
+  BR: "Nacional (presidente)", AC: "Acre", AL: "Alagoas", AM: "Amazonas", AP: "Amapá", BA: "Bahia", CE: "Ceará",
+  DF: "Distrito Federal", ES: "Espírito Santo", GO: "Goiás", MA: "Maranhão", MG: "Minas Gerais", MS: "Mato Grosso do Sul",
+  MT: "Mato Grosso", PA: "Pará", PB: "Paraíba", PE: "Pernambuco", PI: "Piauí", PR: "Paraná", RJ: "Rio de Janeiro",
+  RN: "Rio Grande do Norte", RO: "Rondônia", RR: "Roraima", RS: "Rio Grande do Sul", SC: "Santa Catarina", SE: "Sergipe",
+  SP: "São Paulo", TO: "Tocantins", ZZ: "Exterior",
+};
+const REGIAO = {};
+for (const [r, ufs] of Object.entries({ NORTE: "AC AM AP PA RO RR TO", NORDESTE: "AL BA CE MA PB PE PI RN SE", CENTROOESTE: "DF GO MS MT", SUDESTE: "ES MG RJ SP", SUL: "PR RS SC" }))
+  for (const uf of ufs.split(" ")) REGIAO[uf] = r;
+const ELEICAO_DIVULGA = { 2018: "2022802018", 2020: "2030402020", 2022: "2040602022", 2024: "2045202024", 2026: "20322002026" };
+const ANOS_GERAIS = [2018, 2022, 2026]; // federal e estadual: um arquivo só; municipais: um arquivo por estado
+const CARGOS = ["PRESIDENTE", "VICE-PRESIDENTE", "GOVERNADOR", "VICE-GOVERNADOR", "SENADOR", "1º SUPLENTE", "2º SUPLENTE",
+  "DEPUTADO FEDERAL", "DEPUTADO ESTADUAL", "DEPUTADO DISTRITAL", "PREFEITO", "VICE-PREFEITO", "VEREADOR"];
+const ordemCargo = c => { const i = CARGOS.indexOf(c); return i < 0 ? 99 : i; };
+// está no cargo hoje: calculado no coletar.py (Senado e Câmara pela lista oficial de quem está em exercício)
+const noCargo = c => c[8] === 1;
+const PAGINA = 60;
+const $ = s => document.querySelector(s);
+const form = $("#filtros");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const norm = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const titulo = s => String(s).toLowerCase().replace(/(^|[\s-])(\S)/g, (m, a, b) => a + b.toUpperCase()).replace(/ (De|Do|Da|Dos|Das|E) /g, m => m.toLowerCase());
+const nomeCargo = c => c === "1º SUPLENTE" || c === "2º SUPLENTE" ? titulo(c) + " de senador" : titulo(c);
+const fmt = n => n.toLocaleString("pt-BR");
+const reais = (n, centavos) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: centavos ? 2 : 0, maximumFractionDigits: centavos ? 2 : 0 });
+const curto = n => {
+  const grande = (v, um, varios) => { const t = v.toLocaleString("pt-BR", { maximumFractionDigits: 1 }); return `R$ ${t} ${t === "1" ? um : varios}`; };
+  return n >= 1e12 ? grande(n / 1e12, "trilhão", "trilhões") : n >= 1e9 ? grande(n / 1e9, "bilhão", "bilhões")
+    : n >= 1e6 ? grande(n / 1e6, "milhão", "milhões") : reais(n);
+};
+const compara = new Intl.Collator("pt").compare;
+const compacto = n => n >= 1e6 ? curto(n) : n >= 1e3 ? `R$ ${Math.round(n / 1e3).toLocaleString("pt-BR")} mil` : reais(n);
+// declarações de bens em ordem: [[ano, valor], ...]; quem não tem registro traz só a anterior (bensAnt)
+function declaracoes(p) {
+  const ds = p.c.filter(c => c[9] >= 0).map(c => [c[0], c[9]]);
+  if (p.bensAnt && !ds.some(d => d[0] === p.bensAnt[0])) ds.push(p.bensAnt);
+  return ds.sort((a, b) => a[0] - b[0]);
+}
+function crescimento(p) {
+  const ds = declaracoes(p);
+  return ds.length > 1 ? { de: ds[0], ate: ds[ds.length - 1], valor: ds[ds.length - 1][1] - ds[0][1] } : null;
+}
+// só decisão final conta no valor: é o dinheiro que o TCU concluiu que sumiu
+const somaDeb = ks => ks.reduce((t, k) => t + (k.s === "final" && k.deb || 0), 0);
+const somaMul = ks => ks.reduce((t, k) => t + (k.s === "final" && k.mul || 0), 0);
+const local = c => titulo(c[3]) + (norm(c[3]) !== norm(UFS[c[2]] || c[2]) && c[2] !== "BR" ? "/" + c[2] : "");
+
+function urlTSE(ano, uf, sq, sgUe, ue) {
+  const id = ano === 2020 && uf === "AP" && norm(ue) === "macapa" ? "2032002020" : ELEICAO_DIVULGA[ano]; // Macapá votou depois em 2020
+  return `https://divulgacandcontas.tse.jus.br/divulga/#/candidato/${REGIAO[uf] || "BRASIL"}/${uf}/${id}/${sq}/${ano}/${sgUe}`;
+}
+
+let D, pessoas = [], porId = new Map(), filtradas = [], extraAtual = [], mostrando = PAGINA, abaAtual = "candidatos", ordemPartido = "razao";
+const todos = {}; // arquivo -> Promise<[pessoa sem registro]>
+
+function opcoes(nome, valores, todos, rotulo = v => v) {
+  const atual = form[nome].value;
+  form[nome].innerHTML = (todos ? `<option value="">${todos}</option>` : "") + valores.map(v => `<option value="${esc(v)}">${esc(rotulo(v))}</option>`).join("");
+  form[nome].value = valores.map(String).includes(atual) ? atual : "";
+}
+
+function lerFiltros() {
+  const f = Object.fromEntries(new FormData(form));
+  f.ano = +f.ano || 0; f.de = +f.de || 0; f.ate = +f.ate || 0;
+  return f;
+}
+
+function candOk(c, f, ignorarPartido) {
+  if (f.mostrar === "nocargo") {
+    if (!noCargo(c)) return false;
+    f = { ...f, ano: 0, sit: "" }; // no cargo hoje já diz a eleição e o resultado
+  }
+  return (!f.ano || c[0] === f.ano) && (!f.cargo || c[1] === f.cargo) && (ignorarPartido || !f.partido || c[4] === f.partido)
+    && (!f.uf || c[2] === f.uf) && (!f.sit || c[5] === f.sit) && (!f.mun || norm(c[3]) === f.mun);
+}
+function casoOk(k, f, st) {
+  return st(k.s) && (!f.fonte || k.f === f.fonte) && (!f.de || (k.ano || 0) >= f.de) && (!f.ate || (k.ano || 9999) <= f.ate);
+}
+
+// arquivo com quem NÃO tem registro (quem tem já está em dados.json)
+function arquivoTodos(f) {
+  if (f.mostrar === "nocargo") return "no-cargo";
+  if (f.mostrar === "registro" || !f.ano) return null;
+  return ANOS_GERAIS.includes(f.ano) ? String(f.ano) : f.uf ? `${f.ano}-${f.uf}` : null;
+}
+function pessoaDeLinha([sq, urna, nome, cargo, uf, ue, sgUe, partido, sit, v, ano, nc, bens, bensAnt]) {
+  const p = { i: sq, u: titulo(urna), n: titulo(nome), v: !!v, k: [], busca: norm(nome + " " + urna), c: [[ano, cargo, uf, ue, partido, sit, urlTSE(ano, uf, sq, sgUe, ue), sq, nc, bens]], bensAnt };
+  porId.set(sq, p);
+  return p;
+}
+function carregarTodos(arq) {
+  todos[arq] ??= fetch(`todos/${arq}.json`).then(r => r.ok ? r.json() : []).then(linhas => linhas.map(pessoaDeLinha)).catch(() => []);
+  return todos[arq];
+}
+
+function filtrar(f, extra) {
+  const ordem = $("#ordem").value;
+  const st = FILTRO_ST[f.st] || FILTRO_ST.ativos, q = norm(f.q || "").trim();
+  // com filtro de caso ligado, só aparece quem tem caso que bate com ele
+  const semCasoEntra = f.mostrar !== "registro" && !f.fonte && !f.de && !f.ate && (f.st || "ativos") === "ativos";
+  filtradas = [];
+  for (const lista of [pessoas, extra]) for (const p of lista) {
+    if (q && !p.busca.includes(q)) continue;
+    const c = p.c.find(c => candOk(c, f));
+    if (!c) continue;
+    const ks = p.k.length ? p.k.filter(k => casoOk(k, f, st)) : p.k;
+    if (!ks.length && !semCasoEntra) continue;
+    filtradas.push({
+      p, c, ks,
+      conf: ks.filter(k => CONF.has(k.s)).length, anal: ks.filter(k => ANAL.has(k.s)).length,
+      rev: ks.filter(k => k.s === "revertido").length, rec: ks.reduce((m, k) => Math.max(m, k.ano || 0), 0),
+      deb: somaDeb(ks), mul: somaMul(ks), oc: ordemCargo(c[1]), bens: c[9] ?? -1,
+      cresc: ordem === "cresc" ? (crescimento(p)?.valor ?? -Infinity) : 0,
+      camp: ordem === "camp" && CAMP ? publico(CAMP.sq[(p.c.find(x => x[0] === 2026) || [])[7]]) : 0,
+    });
+  }
+  const nome = (a, b) => compara(a.p.u, b.p.u);
+  filtradas.sort(ordem === "nome" ? nome
+    : ordem === "bens" ? (a, b) => b.bens - a.bens || nome(a, b)
+    : ordem === "cresc" ? (a, b) => b.cresc - a.cresc || nome(a, b)
+    : ordem === "camp" ? (a, b) => b.camp - a.camp || nome(a, b)
+    : ordem === "cargo" ? (a, b) => a.oc - b.oc || b.deb - a.deb || b.conf - a.conf || nome(a, b)
+    : ordem === "rec" ? (a, b) => b.rec - a.rec || b.conf - a.conf || a.oc - b.oc || nome(a, b)
+    : ordem === "conf" ? (a, b) => b.conf - a.conf || b.deb - a.deb || b.anal - a.anal || a.oc - b.oc || nome(a, b)
+    : (a, b) => b.deb - a.deb || b.conf - a.conf || b.anal - a.anal || a.oc - b.oc || nome(a, b));
+}
+
+function colunaValor(r) {
+  const ordem = $("#ordem").value;
+  if (ordem === "bens") return r.bens >= 0 ? `<b>${compacto(r.bens)}</b><span>em bens declarados</span>` : `<span>não declarou bens</span>`;
+  if (ordem === "cresc") {
+    const g = crescimento(r.p);
+    return g ? `<b>${g.valor >= 0 ? "+" : "-"}${compacto(Math.abs(g.valor))}</b><span>de ${g.de[0]} a ${g.ate[0]}</span>` : `<span>só uma declaração</span>`;
+  }
+  if (ordem === "camp") return r.camp ? `<b>${compacto(r.camp)}</b><span>de dinheiro público</span>` : `<span>-</span>`;
+  return r.deb ? `<b>${reais(r.deb)}</b><span>sumiu</span>` : `<span>-</span>`;
+}
+
+function linha(r, i) {
+  const { p, c } = r;
+  const fontes = Object.entries(r.ks.reduce((m, k) => (m[k.f] = (m[k.f] || 0) + 1, m), {}))
+    .map(([f, n]) => `<span class="chip">${n} ${esc(FONTE[f] || f)}</span>`).join("");
+  const nada = !r.ks.length ? (p.v ? `<span class="chip">Nada encontrado</span>` : `<span class="chip">Sem CPF no TSE: só Justiça Eleitoral checada</span>`) : "";
+  return `<button type="button" class="item" data-i="${esc(p.i)}">
+    <span class="pos num">${i + 1}</span>
+    <span class="nome"><b>${esc(p.u)}</b><span>${esc(p.n)}</span></span>
+    <span class="cand">${esc(nomeCargo(c[1]))} em ${c[0]}<span>${esc(local(c))}<span class="so-mob"> · ${esc(c[4])}</span> · ${esc(c[5])}</span></span>
+    <span class="partido">${esc(c[4])}</span>
+    <span class="reais num">${colunaValor(r)}</span>
+    <span class="conta num"><b>${r.conf}</b><span>${r.conf === 1 ? "condenação" : "condenações"}</span></span>
+    <span class="extra">${r.anal ? `<span class="chip s-recurso">${r.anal} com recurso</span>` : ""}${r.rev ? `<span class="chip s-revertido">${r.rev} derrubada${r.rev > 1 ? "s" : ""}</span>` : ""}${fontes}${nada}</span>
+  </button>`;
+}
+
+function desenharLista(f) {
+  const lista = $("#lista");
+  if (!filtradas.length) {
+    lista.innerHTML = `<div class="vazio">Nenhum candidato com esses filtros.</div>`;
+  } else {
+    lista.innerHTML = `<div class="cab"><span>#</span><span>Candidato</span><span>Candidatura</span><span>Partido</span><span>${{ bens: "Bens declarados", cresc: "Patrimônio", camp: "Campanha 2026" }[$("#ordem").value] || "Dinheiro que sumiu"}</span><span>Condenações</span><span>Quem condenou</span></div>`
+      + filtradas.slice(0, mostrando).map(linha).join("");
+  }
+  const deb = filtradas.reduce((t, r) => t + r.deb, 0), mul = filtradas.reduce((t, r) => t + r.mul, 0);
+  const com = filtradas.filter(r => r.ks.length).length;
+  let aviso = "";
+  if (f.mostrar === "todos" && !arquivoTodos(f))
+    aviso = !f.ano ? " Aqui aparece só quem tem registro: escolha uma eleição para ver todos os candidatos."
+      : ` Aqui aparece só quem tem registro: escolha o estado para ver todos os candidatos de ${f.ano}.`;
+  $("#total").innerHTML = `<b>${fmt(filtradas.length)}</b> ${filtradas.length === 1 ? "candidato" : "candidatos"}, ${fmt(com)} com algum registro. Somando, <b>${curto(deb)}</b> de dinheiro público sumiu na mão dessas pessoas, segundo o TCU, mais <b>${curto(mul)}</b> em multas (valores da época, sem correção).${aviso}`;
+  $(".titulo").textContent = (f.mostrar === "nocargo" ? "Quem está no cargo hoje. " : "") + {
+    deb: "Na mão de quem mais sumiu dinheiro público", conf: "Ranking de quem tem mais condenações",
+    cargo: "Candidatos do presidente ao vereador", rec: "Condenações mais recentes primeiro", nome: "Candidatos em ordem alfabética",
+    bens: "Quem declarou ter mais bens", cresc: "De quem o patrimônio declarado mais cresceu",
+    camp: "Quem mais recebeu dinheiro público para a campanha de 2026",
+  }[$("#ordem").value];
+  $("#mais").hidden = mostrando >= filtradas.length;
+  $("#mais").textContent = `Mostrar mais (${fmt(Math.min(PAGINA, filtradas.length - mostrando))})`;
+}
+
+function desenharPartidos(f) {
+  f = { ...f, mun: "" }; // os totais por partido não descem a município
+  const den = {}, num = {}, val = {};
+  for (const [chave, n] of Object.entries(D.totais)) {
+    const [ano, partido, cargo, uf, sit] = chave.split("|");
+    if (candOk([+ano, cargo, uf, "", partido, sit], f, true)) den[partido] = (den[partido] || 0) + n;
+  }
+  for (const p of pessoas) {
+    if (!p.v) continue;
+    const ks = p.k.filter(k => casoOk(k, f, FILTRO_ST.conf));
+    if (!ks.length) continue;
+    const cs = p.c.filter(c => candOk(c, f, true));
+    for (const c of cs) num[c[4]] = (num[c[4]] || 0) + 1;
+    // valor conta uma vez por pessoa em cada partido, mesmo com várias candidaturas
+    for (const pt of new Set(cs.map(c => c[4]))) val[pt] = (val[pt] || 0) + somaDeb(ks);
+  }
+  // "normal pro tamanho": quanto o partido teria se o dinheiro que sumiu fosse dividido pelo número de candidatos
+  const totalDen = Object.values(den).reduce((a, b) => a + b, 0), totalVal = Object.values(val).reduce((a, b) => a + b, 0);
+  const linhas = Object.keys(den).filter(pt => den[pt] > 0).map(pt => {
+    const esperado = totalDen ? totalVal * den[pt] / totalDen : 0, v = val[pt] || 0;
+    return { pt, den: den[pt], num: num[pt] || 0, val: v, esperado, razao: esperado ? v / esperado : 0, taxa: 1000 * (num[pt] || 0) / den[pt] };
+  });
+  // amostra pequena vai para o fim: com poucas candidaturas a taxa oscila por acaso
+  linhas.sort((a, b) => (a.den < 300) - (b.den < 300) || b[ordemPartido] - a[ordemPartido] || b.den - a.den);
+  const max = Math.max(...linhas.map(l => l.taxa), 0.001);
+  $("#ptab").innerHTML = linhas.map(l => `<tr${f.partido === l.pt ? ' style="background:#f2f4f7"' : ""}>
+    <td><button type="button" class="link-partido" data-partido="${esc(l.pt)}">${esc(l.pt)}</button>${l.den < 300 ? ' <span class="pequena">(poucos candidatos)</span>' : ""}</td>
+    <td class="r num">${fmt(l.den)}</td><td class="r num">${fmt(l.num)}</td>
+    <td><span class="barraP"><i style="width:${(l.taxa / max) * 120}px"></i><span class="num">${l.taxa.toLocaleString("pt-BR", { maximumFractionDigits: 1, minimumFractionDigits: 1 })}</span></span></td>
+    <td class="r num">${l.val ? curto(l.val) : "-"}</td><td class="r num">${l.esperado ? curto(l.esperado) : "-"}</td>
+    <td class="r num"><b class="${l.razao >= 1.5 ? "acima" : l.razao && l.razao <= 0.67 ? "abaixo" : ""}">${l.esperado ? vezes(l.razao) : "-"}</b></td>
+  </tr>`).join("") || `<tr><td colspan="7" class="vazio">Sem candidaturas com esses filtros.</td></tr>`;
+  ultimoPartido = { f, linhas: Object.fromEntries(linhas.map(l => [l.pt, l])) };
+  document.querySelectorAll("[data-po]").forEach(b => b.setAttribute("aria-pressed", b.dataset.po === ordemPartido));
+}
+
+let ultimoPartido = null;
+function abrirPartido(pt) {
+  const { f, linhas } = ultimoPartido, l = linhas[pt];
+  const filtro = { ...f, partido: pt };
+  const gente = [];
+  for (const p of pessoas) {
+    if (!p.v) continue;
+    const c = p.c.find(c => candOk(c, filtro));
+    const ks = c ? p.k.filter(k => casoOk(k, f, FILTRO_ST.conf)) : [];
+    if (ks.length) gente.push({ p, c, deb: somaDeb(ks), conf: ks.length });
+  }
+  gente.sort((a, b) => b.deb - a.deb || b.conf - a.conf || compara(a.p.u, b.p.u));
+  const dlg = $("#ficha");
+  dlg.innerHTML = `<div class="fcab"><div><h2 id="fnome">${esc(pt)}</h2>
+      <p>${fmt(l.den)} candidaturas checadas${f.ano ? " em " + f.ano : ""}, ${fmt(l.num)} delas de gente já condenada (${l.taxa.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} a cada mil).</p>
+      <div class="totais num"><span>Sumiu <b>${curto(l.val)}</b></span><span>Normal pro tamanho <b>${curto(l.esperado)}</b></span><span><b>${vezes(l.razao)}</b> o normal</span></div></div>
+      <button type="button" class="fechar" aria-label="Fechar" onclick="fecharFicha()">×</button></div>
+    <div class="fcorpo">
+      <p class="pequena">"Normal pro tamanho" é quanto o partido teria se o dinheiro que sumiu (condenações do TCU) fosse dividido entre os partidos pelo número de candidatos de cada um. Mesma conta para todos. O partido é o da candidatura.</p>
+      <h3>${fmt(gente.length)} ${gente.length === 1 ? "pessoa" : "pessoas"} com condenação, do maior valor para o menor</h3>
+      <div class="cartoes">${gente.slice(0, 300).map((x, i) => `<button type="button" class="pessoa" data-ficha-emenda="${esc(x.p.i)}">
+        <span class="pnome"><b>${i + 1}. ${esc(x.p.u)}</b><span>${esc(nomeCargo(x.c[1]))} em ${x.c[0]} · ${esc(local(x.c))}</span></span>
+        <span class="pill ruim">${x.deb ? "Sumiu " + curto(x.deb) : x.conf + (x.conf === 1 ? " condenação" : " condenações")}</span></button>`).join("")}</div>
+      ${gente.length > 300 ? `<p class="pequena">Mostrando os 300 primeiros. Use o Ranking com o filtro de partido para ver todos.</p>` : ""}
+    </div>`;
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+}
+$("#ptab").addEventListener("click", e => { const b = e.target.closest("[data-partido]"); if (b) abrirPartido(b.dataset.partido); });
+
+function caso(k) {
+  const san = (k.san || []).filter(Boolean);
+  return `<div class="caso">
+    <div class="t"><b>${esc(k.t)}</b><span class="chip s-${esc(k.s)}">${esc(STATUS[k.s] || k.s)}</span></div>
+    <div class="meta">${esc(k.o)}${k.pr ? " · Processo " + esc(k.pr) : ""}${k.ac ? " · Decisão " + esc(k.ac) : ""}</div>
+    ${k.st ? `<div class="meta">${esc(k.st)}</div>` : ""}
+    ${san.length ? `<ul>${san.map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
+    ${k.x ? `<div class="x">${esc(k.x)}</div>` : ""}
+    ${k.deb || k.mul ? `<div class="valores num">${k.deb ? `<span>Dinheiro que sumiu<br><b>${reais(k.deb, 1)}</b></span>` : ""}${k.mul ? `<span>Multa<br><b>${reais(k.mul, 1)}</b></span>` : ""}<span class="pequena">Condenado a pagar de volta. Valor da época, sem correção: hoje a dívida é maior${k.sol ? ". Dívida em conjunto com outros condenados: cada um pode ser cobrado pelo valor todo" : ""}.</span></div>`
+      : k.vx && !k.ant ? `<div class="x">Não achamos o valor que sumiu nem multa para esta pessoa no texto da decisão. Confira no link.</div>` : ""}
+    ${k.ant ? `<div class="x">Parte da dívida é de antes do Real (em cruzeiro) e não entrou na soma: veja o valor na decisão.</div>` : ""}
+    ${k.tr ? `<details><summary>Prova: ler o trecho da decisão de onde saiu o valor</summary><p>${esc(k.tr)}</p></details>` : ""}
+    <div class="lk">${(k.l || []).filter(l => /^https:\/\//.test(l[1])).map(l => `<a href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join("")}</div>
+  </div>`;
+}
+
+function abrirFicha(id) {
+  if (/^m\d+$/.test(id)) return abrirCidade(+id.slice(1));
+  const p = porId.get(id);
+  if (!p) return;
+  const ordem = { final: 0, sancao: 0, recurso: 1, andamento: 1, revertido: 2, outro: 3 };
+  const grupos = [["Condenações", 0], ["Ainda cabe recurso", 1], ["Acusações derrubadas", 2], ["Sem conclusão", 3]]
+    .map(([nome, g]) => [nome, p.k.filter(k => (ordem[k.s] ?? 3) === g)]).filter(([, ks]) => ks.length);
+  const assunto = encodeURIComponent(`Correção: ${p.u} (${p.i})`);
+  const dlg = $("#ficha");
+  const deb = somaDeb(p.k), mul = somaMul(p.k), g = crescimento(p);
+  const vazio = p.v
+    ? "Nada encontrado nas listas do TSE, do TCU e da CGU. Isso não garante ficha limpa: processos criminais, tribunais de contas dos estados e investigações em andamento não entram aqui (veja Como funciona)."
+    : "Nada na Justiça Eleitoral. O TSE não divulgou o CPF desta candidatura (2024), então não deu para checar no TCU e na CGU.";
+  dlg.innerHTML = `<div class="fcab"><div><h2 id="fnome">${esc(p.u)}</h2><p>${esc(p.n)}</p>
+      ${deb || mul ? `<div class="totais num"><span>Dinheiro público que sumiu na mão dessa pessoa <b>${reais(deb, 1)}</b></span><span>Multas <b>${reais(mul, 1)}</b></span></div>` : ""}
+      ${g ? `<div class="totais num"><span>Bens declarados: <b>${compacto(g.de[1])}</b> em ${g.de[0]} e <b>${compacto(g.ate[1])}</b> em ${g.ate[0]}</span></div>` : ""}</div>
+      <button type="button" class="fechar" aria-label="Fechar" onclick="fecharFicha()">×</button></div>
+    <div class="fcorpo">
+      <h3>Candidaturas</h3>
+      <div class="cands">${p.c.map(c => `<div><b>${c[0]}</b><span>${esc(nomeCargo(c[1]))}, ${esc(local(c))}</span><span>${esc(c[4])}</span><span class="chip">${esc(c[5])}</span><span class="pequena">${c[9] >= 0 ? "Bens: " + compacto(c[9]) : c[9] === -1 ? "Não declarou bens" : ""}</span><a href="${esc(c[6])}" target="_blank" rel="noopener">Prova: ficha no TSE</a></div>`).join("")}</div>
+      ${grupos.length ? grupos.map(([nome, ks]) => `<h3>${nome} (${ks.length})</h3>${ks.map(caso).join("")}`).join("") : `<h3>Registros</h3><p class="x">${vazio}</p>`}
+      <div id="fichaCampanha"></div>
+      <div id="fichaEmendas"></div>
+      <div id="fichaCota"></div>
+      <div id="fichaEmpresas"></div>
+      <p class="pequena">Bens são os que o próprio candidato declarou ao TSE em cada eleição, pelo valor que ele digitou (geralmente o de compra, sem atualizar). Tem erro de digitação, como casa de "R$ 1 bilhão": confira a lista de bens na ficha do TSE. Aumento de patrimônio não é prova de nada: pode vir de herança, salário ou empresa.</p>
+      <p class="rodapeF">${p.v ? "Ligação feita pelo CPF registrado no TSE." : "CPF desta candidatura não é público (2024): só aparecem os casos da própria Justiça Eleitoral."} Confira sempre no link oficial. Viu algo errado? <a href="https://github.com/Tox1469/ficha-aberta/issues/new?title=${assunto}" target="_blank" rel="noopener">Peça correção</a>.</p>
+    </div>`;
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+  if (abaAtual !== "inicio") salvarHash(id);
+  carregarCampanha().then(cp => {
+    const c26 = p.c.find(c => c[0] === (cp && cp.ano)), r = c26 && cp.sq[c26[7]], alvo = $("#fichaCampanha");
+    if (!r || !alvo || !dlg.open || $("#fnome").textContent !== p.u) return;
+    alvo.innerHTML = `<h3>Dinheiro da campanha de ${cp.ano}</h3>
+      <div class="valores num"><span>Recebeu<br><b>${compacto(r[0])}</b></span><span>Fundo eleitoral<br><b>${compacto(r[1])}</b></span><span>Fundo partidário<br><b>${compacto(r[2])}</b></span>
+      <span class="pequena">Fundo eleitoral e fundo partidário são dinheiro público. Valores informados à Justiça Eleitoral até agora.</span></div>`;
+  });
+  carregarCota().then(ct => {
+    const i = ct && p.c.map(c => ct.sq[c[7]]).find(x => x !== undefined), alvo = $("#fichaCota");
+    if (i !== undefined && alvo && dlg.open && $("#fnome").textContent === p.u) alvo.innerHTML = blocoCota(ct.dep[i]);
+  });
+  carregarEmendas().then(e => {
+    const cod = e && p.c.map(c => e.sq[c[7]]).find(Boolean), alvo = $("#fichaEmendas");
+    if (cod && alvo && dlg.open && $("#fnome").textContent === p.u) alvo.innerHTML = blocoEmendasAutor(e, cod);
+  });
+  const sq = p.c[0][7];
+  Promise.all([carregarEmpresas(sq.slice(-2)), carregarListaEmpresas()]).then(([pd, l]) => {
+    const d = pd && pd[sq], alvo = $("#fichaEmpresas");
+    if (d && alvo && dlg.open && $("#fnome").textContent === p.u) alvo.innerHTML = blocoEmpresas(d, l && l.mes);
+  });
+}
+function fecharFicha() { $("#ficha").close(); }
+$("#ficha").addEventListener("close", () => abaAtual === "prefeituras" ? salvarHashPref()
+  : abaAtual === "inicio" ? history.replaceState(null, "", "#" + new URLSearchParams({ cidade: $("#cidade").value })) : salvarHash());
+$("#ficha").addEventListener("click", e => { if (e.target.id === "ficha") fecharFicha(); });
+
+function salvarHash(ficha) {
+  const h = new URLSearchParams();
+  for (const [k, v] of new FormData(form)) if (v && !(k === "st" && v === "ativos") && !(k === "mostrar" && v === "todos")) h.set(k, v);
+  if (abaAtual !== "candidatos") h.set("aba", abaAtual);
+  else h.set("aba", "candidatos");
+  if (ficha) h.set("c", ficha);
+  history.replaceState(null, "", h.size ? "#" + h : location.pathname);
+}
+
+function atualizarMunicipios(f, extra) {
+  if (f.mostrar === "nocargo") f = { ...f, ano: 2024 }; // no cargo hoje, município = eleitos de 2024
+  const municipal = f.ano && !ANOS_GERAIS.includes(f.ano) && f.uf;
+  $("#filtroMun").style.visibility = municipal ? "" : "hidden";
+  if (!municipal) { form.mun.value = ""; return; }
+  const nomes = new Map();
+  for (const lista of [pessoas, extra]) for (const p of lista)
+    for (const c of p.c) if (c[0] === f.ano && c[2] === f.uf) nomes.set(norm(c[3]), titulo(c[3]));
+  const chave = [...nomes.keys()].sort(compara);
+  if (form.mun.dataset.de !== `${f.ano}-${f.uf}-${chave.length}`) {
+    opcoes("mun", chave, "Todos", k => nomes.get(k));
+    form.mun.dataset.de = `${f.ano}-${f.uf}-${chave.length}`;
+  }
+}
+
+let versao = 0;
+async function atualizar() {
+  if (abaAtual === "inicio") {
+    const h = new URLSearchParams(location.hash.slice(1));
+    let guardada = "";
+    try { guardada = localStorage.getItem("fa-cidade") || ""; } catch {}
+    const cidade = h.get("cidade") || $("#cidade").value || guardada;
+    await carregarInicio();
+    if (cidade) { $("#cidade").value = cidade; await mostrarCidade(cidade); } else history.replaceState(null, "", location.pathname);
+    return;
+  }
+  if (abaAtual === "prefeituras") {
+    await carregarPrefeituras();
+    if (abaAtual === "prefeituras") desenharPrefeituras();
+    return;
+  }
+  if (abaAtual === "como") return salvarHash();
+  if (abaAtual === "emendas") return desenharEmpresasPropria(), desenharEntidades(), desenharEmendas();
+  if (abaAtual === "parquinhos") return desenharParquinhos();
+  if ($("#ordem").value === "camp") {
+    if (form.ano.value !== "2026") form.ano.value = "2026";
+    await carregarCampanha();
+  }
+  const v = ++versao, f = lerFiltros(), arq = arquivoTodos(f);
+  let extra = [];
+  if (arq) {
+    if (abaAtual === "candidatos") $("#total").textContent = "Carregando todos os candidatos…";
+    extra = await carregarTodos(arq);
+    if (v !== versao) return;
+  }
+  extraAtual = extra;
+  for (const nome of ["ano", "sit"]) form[nome].closest("label").style.visibility = f.mostrar === "nocargo" ? "hidden" : "";
+  atualizarMunicipios(f, extra);
+  const g = lerFiltros();
+  filtrar(g, extra);
+  mostrando = PAGINA;
+  if (abaAtual === "candidatos") desenharLista(g);
+  if (abaAtual === "partidos") desenharPartidos(g);
+  salvarHash($("#ficha").open ? new URLSearchParams(location.hash.slice(1)).get("c") : null);
+}
+
+function trocarAba(aba) {
+  abaAtual = aba;
+  document.querySelectorAll("[data-aba]").forEach(b => b.setAttribute("aria-selected", b.dataset.aba === aba));
+  for (const a of ["inicio", "candidatos", "parquinhos", "partidos", "prefeituras", "emendas", "como"]) $("#aba-" + a).hidden = a !== aba;
+  form.hidden = $("#abrirFiltros").hidden = ["inicio", "como", "prefeituras", "emendas", "parquinhos"].includes(aba);
+  $("#topoDinheiro").hidden = aba !== "candidatos";
+  for (const id of ["#filtroSt", "#filtroMostrar"]) $(id).style.visibility = aba === "partidos" ? "hidden" : "";
+  return atualizar();
+}
+
+async function iniciar() {
+  D = await fetch("dados.json").then(r => r.json());
+  pessoas = D.p;
+  for (const p of pessoas) { p.n = titulo(p.n); p.u = titulo(p.u); p.busca = norm(p.n + " " + p.u); porId.set(p.i, p); }
+  const uniq = (fn) => [...new Set(pessoas.flatMap(fn))].filter(v => v !== "" && v != null);
+  const chaves = Object.keys(D.totais).map(k => k.split("|"));
+  const anosEleicao = [...new Set(chaves.map(k => k[0]))].sort().reverse();
+  form.ano.innerHTML = `<option value="todas" selected>Todas (só quem tem registro)</option>`
+    + anosEleicao.map(a => `<option value="${a}">${a}</option>`).join("");
+  opcoes("cargo", [...new Set(chaves.map(k => k[2]))].sort((a, b) => ordemCargo(a) - ordemCargo(b)), "Todos", nomeCargo);
+  opcoes("partido", [...new Set(chaves.map(k => k[1]))].sort(), "Todos");
+  opcoes("uf", [...new Set(chaves.map(k => k[3]))].sort((a, b) => compara(UFS[a] || a, UFS[b] || b)), "Todos", uf => UFS[uf] || uf);
+  opcoes("sit", ["Eleito", "2º turno", "Suplente", "Não eleito", "Sem resultado"], "Todos");
+  opcoes("fonte", uniq(p => p.k.map(k => k.f)).sort(), "Todas", f => FONTE[f] || f);
+  const anos = uniq(p => p.k.map(k => k.ano)).sort();
+  opcoes("de", anos, "Início");
+  opcoes("ate", [...anos].reverse(), "Hoje");
+  $("#fontes").innerHTML = D.fontes.map(f => `<li><a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.nome)}</a></li>`).join("");
+  $("#gerado").textContent = D.gerado;
+
+  const h = new URLSearchParams(location.hash.slice(1));
+  for (const [k, v] of h) if (form[k] && k !== "mun") form[k].value = v;
+  if (h.get("mun")) { await atualizar(); form.mun.value = h.get("mun"); }
+  // sem nada no link, abre no ranking; link com cidade abre na busca por cidade
+  await trocarAba(["candidatos", "parquinhos", "partidos", "prefeituras", "emendas", "como"].includes(h.get("aba")) ? h.get("aba") : h.get("cidade") ? "inicio" : "candidatos");
+  if (h.get("c")) abrirFicha(h.get("c"));
+}
+
+// ---------- prefeituras ----------
+const PORTES = [[0, 5e3, "até 5 mil moradores"], [5e3, 1e4, "5 a 10 mil moradores"], [1e4, 2e4, "10 a 20 mil moradores"],
+  [2e4, 5e4, "20 a 50 mil moradores"], [5e4, 1e5, "50 a 100 mil moradores"], [1e5, 5e5, "100 a 500 mil moradores"], [5e5, Infinity, "mais de 500 mil moradores"]];
+const NOME_AREA = {
+  "Legislativa": "Câmara de Vereadores", "Administração": "Administração (a máquina da prefeitura)",
+  "Encargos Especiais": "Dívidas e encargos", "Previdência Social": "Aposentadoria dos servidores",
+  "Essencial à Justiça": "Procuradoria e defensoria",
+};
+const pform = $("#pfiltros");
+const mediana = xs => { const v = xs.filter(x => x > 0).sort((a, b) => a - b); return v.length ? v[v.length >> 1] : 0; };
+const vezes = x => { const n = x.toLocaleString("pt-BR", { maximumFractionDigits: 1 }); return n + (n === "1" ? " vez" : " vezes"); };
+let PREF = null, pfiltradas = [], pmostrando = PAGINA;
+
+async function carregarPrefeituras() {
+  if (PREF) return;
+  const cidades = await fetch("prefeituras.json").then(r => r.ok ? r.json() : []).catch(() => []);
+  // o "normal" de cada tamanho de cidade é a mediana do gasto por morador, no total e em cada área
+  const grupos = PORTES.map(() => []);
+  for (const c of cidades) {
+    c.porte = Math.max(0, PORTES.findIndex(([a, b]) => c.pop >= a && c.pop < b));
+    c.hab = c.gasto / c.pop;
+    grupos[c.porte].push(c);
+  }
+  const normal = grupos.map(g => ({
+    hab: mediana(g.map(c => c.hab)),
+    areas: Object.fromEntries([...new Set(g.flatMap(c => Object.keys(c.areas)))].map(a => [a, mediana(g.map(c => (c.areas[a] || 0) / c.pop))])),
+  }));
+  for (const c of cidades) {
+    const n = c.normal = normal[c.porte];
+    const r = a => n.areas[a] ? (c.areas[a] || 0) / c.pop / n.areas[a] : 0;
+    Object.assign(c, { razao: n.hab ? c.hab / n.hab : 0, adm: r("Administração"), cam: r("Legislativa"), busca: norm(c.nome) });
+  }
+  PREF = cidades;
+  pform.uf.innerHTML = `<option value="">Todos</option>` + [...new Set(cidades.map(c => c.uf))].sort((a, b) => compara(UFS[a], UFS[b])).map(uf => `<option value="${esc(uf)}">${esc(UFS[uf] || uf)}</option>`).join("");
+  pform.porte.innerHTML = `<option value="">Todos</option>` + PORTES.map((p, i) => `<option value="${i}">${p[2][0].toUpperCase() + p[2].slice(1)}</option>`).join("");
+  const h = new URLSearchParams(location.hash.slice(1));
+  for (const k of ["q", "uf", "porte", "ordem"]) if (h.get("p" + k)) pform[k].value = h.get("p" + k);
+}
+
+function linhaCidade(c, i, ordem) {
+  const p = c.prefeito; // [sq, nome de urna, partido, condenações, dinheiro que sumiu]
+  const [razao, rotulo] = ordem === "adm" ? [c.adm, "na Administração"] : ordem === "cam" ? [c.cam, "na Câmara"] : [c.razao, "no total"];
+  const roy = c.receita ? c.royalties / c.receita : 0;
+  return `<button type="button" class="item pitem" data-m="${c.ibge}">
+    <span class="pos num">${i + 1}</span>
+    <span class="nome"><b>${esc(c.nome)}/${esc(c.uf)}</b><span>${fmt(c.pop)} moradores</span></span>
+    <span class="cand num">${curto(c.gasto)} em ${c.ano}<span>${reais(c.hab)} por morador</span></span>
+    <span class="reais num"><b>${razao ? vezes(razao) : "-"}</b><span>o normal ${rotulo}</span></span>
+    <span class="extra">${roy >= 0.1 ? `<span class="chip">${Math.round(roy * 100)}% veio de royalties</span>` : ""}${p ? `<span class="chip">Prefeito: ${esc(p[1])} (${esc(p[2])})</span>${p[3] ? `<span class="chip s-final">${p[3]} ${p[3] === 1 ? "condenação" : "condenações"}${p[4] ? ", sumiu " + curto(p[4]) : ""}</span>` : ""}` : ""}${c.outros.length ? `<span class="chip s-sancao">${c.outros.length} vereador/vice com condenação</span>` : ""}</span>
+  </button>`;
+}
+
+function desenharPrefeituras() {
+  const f = Object.fromEntries(new FormData(pform)), q = norm(f.q || "").trim();
+  pfiltradas = PREF.filter(c => (!q || c.busca.includes(q)) && (!f.uf || c.uf === f.uf) && (f.porte === "" || c.porte === +f.porte));
+  const chave = { razao: c => c.razao, adm: c => c.adm, cam: c => c.cam, hab: c => c.hab, total: c => c.gasto }[f.ordem] || (c => c.razao);
+  pfiltradas.sort((a, b) => chave(b) - chave(a));
+  $("#plista").innerHTML = pfiltradas.length
+    ? `<div class="cab pcab"><span>#</span><span>Cidade</span><span>Gasto</span><span>Comparado a cidades do mesmo tamanho</span><span>Quem governa</span></div>`
+      + pfiltradas.slice(0, pmostrando).map((c, i) => linhaCidade(c, i, f.ordem)).join("")
+    : `<div class="vazio">${PREF.length ? "Nenhuma cidade com esses filtros." : "Não foi possível carregar as contas das prefeituras."}</div>`;
+  const total = pfiltradas.reduce((t, c) => t + c.gasto, 0);
+  $("#ptotal").innerHTML = `<b>${fmt(pfiltradas.length)}</b> prefeituras, que juntas gastaram <b>${curto(total)}</b>.`;
+  $("#pmais").hidden = pmostrando >= pfiltradas.length;
+  salvarHashPref();
+}
+
+function salvarHashPref(cidade) {
+  const h = new URLSearchParams({ aba: "prefeituras" });
+  for (const [k, v] of new FormData(pform)) if (v && !(k === "ordem" && v === "razao")) h.set("p" + k, v);
+  if (cidade) h.set("c", "m" + cidade);
+  history.replaceState(null, "", "#" + h);
+}
+
+function abrirCidade(ibge) {
+  const c = PREF && PREF.find(c => c.ibge === ibge);
+  if (!c) return;
+  const roy = c.receita ? c.royalties / c.receita : 0;
+  const areas = Object.entries(c.areas).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(([a, v]) => {
+    const hab = v / c.pop, nrm = c.normal.areas[a] || 0, r = nrm ? hab / nrm : 0;
+    return `<tr${r >= 2 ? ' class="alto"' : ""}><td>${esc(NOME_AREA[a] || a)}</td><td class="r num">${curto(v)}</td><td class="r num">${reais(hab)}</td><td class="r num">${nrm ? reais(nrm) : "-"}</td><td class="r num"><b>${r ? vezes(r) : "-"}</b></td></tr>`;
+  }).join("");
+  const pessoa = (sq, nome, cargo, partido, conf, deb) => `<div><b>${esc(nome)}</b><span>${esc(cargo)}</span><span>${esc(partido)}</span>${conf
+    ? `<span class="chip s-final">${conf} ${conf === 1 ? "condenação" : "condenações"}${deb ? ", sumiu " + curto(deb) : ""}</span><a href="#" data-ficha="${esc(sq)}">Ver a ficha</a>`
+    : `<span class="chip">Nada encontrado</span>`}</div>`;
+  const p = c.prefeito;
+  const slug = norm(c.nome).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const dlg = $("#ficha");
+  dlg.innerHTML = `<div class="fcab"><div><h2 id="fnome">${esc(c.nome)}/${esc(c.uf)}</h2><p>${fmt(c.pop)} moradores · contas de ${c.ano}</p>
+      <div class="totais num"><span>Gastou <b>${curto(c.gasto)}</b></span><span>Por morador <b>${reais(c.hab)}</b></span><span><b>${vezes(c.razao)}</b> o normal</span></div></div>
+      <button type="button" class="fechar" aria-label="Fechar" onclick="fecharFicha()">×</button></div>
+    <div class="fcorpo">
+      <p class="x">Cidades de ${PORTES[c.porte][2]} gastam normalmente ${reais(c.normal.hab)} por morador. ${esc(c.nome)} gastou ${reais(c.hab)}, ou seja, ${vezes(c.razao)} o normal.${roy >= 0.05 ? ` <b>${Math.round(roy * 100)}% do dinheiro que entrou veio de royalties e compensações</b> (petróleo, minério, energia), o que explica parte do gasto alto.` : ""}</p>
+      <h3>Quem governa hoje</h3>
+      <div class="cands">${p ? pessoa(p[0], p[1], "Prefeito", p[2], p[3], p[4]) : `<div>Prefeito não encontrado nos dados do TSE pelo nome da cidade.</div>`}${c.outros.map(o => pessoa(...o)).join("")}</div>
+      <p class="pequena">Vice e vereadores só aparecem aqui se tiverem condenação. Veja todos em Candidatos, com "Só quem está no cargo hoje".</p>
+      <h3>Para onde foi o dinheiro</h3>
+      <table class="ptab areas"><thead><tr><th>Área</th><th class="r">Gasto</th><th class="r">Por morador</th><th class="r">Normal pro tamanho</th><th class="r">Comparação</th></tr></thead><tbody>${areas}</tbody></table>
+      <p class="pequena">Destacado: área em que a cidade gastou o dobro ou mais do normal para o seu tamanho. "Normal" é a mediana das cidades de ${PORTES[c.porte][2]}.</p>
+      <div class="lk"><a href="https://portaldatransparencia.gov.br/localidades/${c.ibge}-${slug}" target="_blank" rel="noopener">Dinheiro federal enviado para a cidade (Portal da Transparência)</a><a href="https://siconfi.tesouro.gov.br/siconfi/pages/public/consulta_finbra/finbra_list.jsf" target="_blank" rel="noopener">Contas no Tesouro (SICONFI)</a></div>
+      <p class="rodapeF">Fonte: contas anuais (DCA) entregues pela própria prefeitura ao Tesouro Nacional. Valores liquidados, sem correção. Gastar muito não prova desvio: veja os contratos e as decisões do tribunal de contas do estado antes de concluir qualquer coisa.</p>
+    </div>`;
+  dlg.querySelectorAll("[data-ficha]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); abrirFicha(a.dataset.ficha); }));
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+  salvarHashPref(ibge);
+}
+
+let pespera;
+pform.addEventListener("input", () => { clearTimeout(pespera); pespera = setTimeout(() => { pmostrando = PAGINA; desenharPrefeituras(); }, 150); });
+$("#pmais").addEventListener("click", () => { pmostrando += PAGINA; desenharPrefeituras(); });
+$("#plista").addEventListener("click", e => { const b = e.target.closest(".pitem"); if (b) abrirCidade(+b.dataset.m); });
+
+// ---------- impostômetro: estimativa a partir da carga tributária de 2025 (Tesouro Nacional, Base CTB GG) ----------
+const IMPOSTOS_ANO = 4127231592463; // governo geral 2025: União 2.750.941 mi, estados 1.067.626 mi, municípios 308.665 mi
+function contarImpostos() {
+  const agora = new Date(), ano = agora.getUTCFullYear();
+  const inicio = Date.UTC(ano, 0, 1, 3); // 1º de janeiro, 0h em Brasília
+  const porSegundo = IMPOSTOS_ANO / (365 * 86400);
+  $("#impostos").textContent = "R$ " + Math.floor(porSegundo * (agora - inicio) / 1000).toLocaleString("pt-BR");
+  $("#impAno").textContent = ano;
+}
+contarImpostos();
+setInterval(contarImpostos, 100);
+
+// ---------- dívida bruta do governo (Banco Central), correndo pelo ritmo dos últimos 12 meses ----------
+function contarDivida(dv) {
+  const [d, m, a] = dv.data.split("/").map(Number);
+  const ref = Date.UTC(a, m, 1, 3); // o saldo é do fim do mês informado (0h do dia 1 do mês seguinte, Brasília)
+  const tick = () => { $("#dividaValor").textContent = "R$ " + Math.floor(dv.valor + dv.por_segundo * (Date.now() - ref) / 1000).toLocaleString("pt-BR"); };
+  const mes = new Date(Date.UTC(a, m - 1, 15)).toLocaleDateString("pt-BR", { month: "long", year: "numeric", timeZone: "UTC" });
+  $("#dividaNota").innerHTML = `${curto(dv.valor)} em ${mes} (${dv.pib.toLocaleString("pt-BR")}% do PIB), pelo <a href="https://www3.bcb.gov.br/sgspub/" target="_blank" rel="noopener">Banco Central</a>. Depois disso, estimativa: sobe ${compacto(dv.por_segundo)} por segundo, o ritmo dos últimos 12 meses.`;
+  tick(); setInterval(tick, 100);
+  $("#divida").hidden = false;
+}
+
+// ---------- corrupção estimada: % do PIB (estudo da FIESP) sobre o PIB do Banco Central ----------
+function contarCorrupcao(c) {
+  const [baixo, alto] = c.pct.map(p => p / 100), porSegundo = c.m12 / (365 * 86400);
+  const tick = () => {
+    const agora = new Date(), seg = (agora - Date.UTC(agora.getUTCFullYear(), 0, 1, 3)) / 1000;
+    $("#corValor").textContent = "R$ " + Math.floor(porSegundo * baixo * seg).toLocaleString("pt-BR");
+    $("#corAno").textContent = agora.getUTCFullYear();
+  };
+  $("#corPeriodos").innerHTML = `<span>Últimos 3 anos: <b>${curto(c.m36 * baixo)} a ${curto(c.m36 * alto)}</b></span><span>Últimos 10 anos: <b>${curto(c.m120 * baixo)} a ${curto(c.m120 * alto)}</b></span>`;
+  $("#corNota").innerHTML = `Estimativa, não é dado oficial. Um <a href="https://exame.com/economia/fiesp-corrupcao-brasil-custa-r-69-bi-ao-ano-559419/" target="_blank" rel="noopener">estudo da FIESP</a> (2010) calculou que a corrupção custa de ${c.pct[0].toLocaleString("pt-BR")}% a ${c.pct[1].toLocaleString("pt-BR")}% de tudo que o país produz (o PIB) por ano. O contador usa o valor mais baixo sobre o <a href="https://www3.bcb.gov.br/sgspub/" target="_blank" rel="noopener">PIB do Banco Central</a> (até ${c.ate})`;
+  tick(); setInterval(tick, 100);
+  $("#corrupcao").hidden = false;
+}
+
+// ---------- quanto dinheiro: os números grandes, cada um com a fonte ----------
+let CAMP = null;
+const carregarCampanha = () => (CAMP ??= fetch("campanha.json").then(r => r.ok ? r.json() : null).catch(() => null));
+const publico = r => r ? r[1] + r[2] : 0; // fundo eleitoral + fundo partidário
+
+fetch("panorama.json").then(r => r.ok ? r.json() : null).then(d => {
+  if (!d) return;
+  if (d.divida) contarDivida(d.divida);
+  if (d.corrupcao) contarCorrupcao(d.corrupcao);
+  const linhas = [];
+  if (d.tcu) linhas.push(`<li><b>${curto(d.tcu.total)}</b> de dinheiro federal sumiu na mão de quem cuidava dele, segundo condenações do Tribunal de Contas da União (TCU) desde ${Object.keys(d.tcu.ano)[0]}: desviado ou gasto sem provar onde (valor da época, sem correção).</li>`);
+  if (d.leniencia) linhas.push(`<li><b>${curto(d.leniencia.total)}</b> ${d.leniencia.n} empresas, como ${[...new Set(d.leniencia.maiores.map(a => a[0]))].slice(0, 4).map(esc).join(", ")}, admitiram corrupção e aceitaram pagar de volta.</li>`);
+  if (d.campanha) linhas.push(`<li><b>${curto(d.campanha.fefc + d.campanha.fp)}</b> de dinheiro público pagou as campanhas de ${d.campanha.ano} (fundo eleitoral e partidário).</li>`);
+  if (d.empresas && d.empresas.total) linhas.push(`<li><b>${curto(d.empresas.total)}</b> de dinheiro público foi parar em empresas de ${fmt(d.empresas.pessoas)} políticos. <a href="#aba=emendas" data-ir-aba="emendas">Ver quem</a></li>`);
+  if (d.emendas) linhas.push(`<li><b>${curto(d.emendas.total)}</b> deputados e senadores mandaram para cidades, entidades e empresas desde 2019. ${curto(d.emendas.pix)} disso caiu no caixa das prefeituras sem dizer em que vai ser gasto ("verba Pix").</li>`);
+  $("#panorama").innerHTML = `<h2>Quanto dinheiro</h2><ul>${linhas.join("")}</ul><p class="pequena">De onde vem: decisões do TCU, acordos fechados pela Controladoria-Geral da União (CGU), contas de campanha entregues ao TSE e Portal da Transparência do governo. Veja as contas em Como funciona.</p>`;
+  $("#panorama").hidden = false;
+});
+
+// ---------- início: digite a cidade e veja todo mundo que manda nela ----------
+let cidadesIndex = null; // "maricá/rj" -> {nome, uf}
+
+function veredito(p) {
+  const deb = somaDeb(p.k), conf = p.k.filter(k => CONF.has(k.s)), anal = p.k.filter(k => ANAL.has(k.s)).length;
+  if (deb) return ["ruim", `Sumiu ${curto(deb)}`];
+  if (conf.length) return ["ruim", conf.length === 1 ? conf[0].t + (conf[0].ano ? ` (${conf[0].ano})` : "") : `${conf.length} condenações`];
+  if (anal) return ["atencao", `${anal} ${anal === 1 ? "caso" : "casos"} ainda com recurso`];
+  if (!p.v) return ["neutro", "Só a Justiça Eleitoral foi checada"];
+  return ["bom", "Nada encontrado nas listas"];
+}
+const peso = p => { const [cls] = veredito(p); return { ruim: 0, atencao: 1, neutro: 2, bom: 3 }[cls]; };
+
+function cartao(p, c) {
+  const [cls, txt] = veredito(p);
+  return `<button type="button" class="pessoa" data-i="${esc(p.i)}">
+    <span class="pnome"><b>${esc(p.u)}</b><span>${esc(noCargo(c) && c[1].includes("SUPLENTE") ? "Senador (assumiu como suplente)" : nomeCargo(c[1]))} · ${esc(c[4])}${c[9] >= 0 ? " · bens: " + compacto(c[9]) : ""}${c[0] === 2026 && c[5] === "2º turno" ? " · vai ao 2º turno" : ""}</span></span>
+    <span class="pill ${cls}">${esc(txt)}</span>
+  </button>`;
+}
+
+function grupo(titulo, itens, aberto = true) {
+  if (!itens.length) return "";
+  itens.sort((a, b) => peso(a.p) - peso(b.p) || compara(a.p.u, b.p.u));
+  const ruins = itens.filter(x => peso(x.p) === 0).length;
+  const resumo = itens.length > 1 ? ` <span class="pequena">${ruins ? `${ruins} de ${itens.length} com condenação` : `${itens.length}, nenhum com condenação`}</span>` : "";
+  const cartoes = xs => xs.length ? `<div class="cartoes">${xs.map(x => cartao(x.p, x.c)).join("")}</div>` : "";
+  if (aberto || itens.length <= 6) return `<h3>${titulo}${resumo}</h3>${cartoes(itens)}`;
+  const visiveis = itens.filter(x => peso(x.p) <= 1), resto = itens.filter(x => peso(x.p) > 1);
+  return `<h3>${titulo}${resumo}</h3>${cartoes(visiveis)}${resto.length ? `<details class="grupo"><summary><span class="vertodos">Ver os outros ${resto.length}</span></summary>${cartoes(resto)}</details>` : ""}`;
+}
+
+async function carregarInicio() {
+  const listas = await Promise.all([carregarTodos("no-cargo"), carregarTodos("2026"), carregarPrefeituras(), carregarEmendas(), carregarParq()]);
+  if (!cidadesIndex) {
+    cidadesIndex = new Map();
+    for (const lista of [pessoas, listas[0]]) for (const p of lista) for (const c of p.c)
+      if (c[0] === 2024 && noCargo(c)) cidadesIndex.set(norm(`${c[3]}/${c[2]}`), { nome: titulo(c[3]), uf: c[2] });
+    $("#listaCidades").innerHTML = [...cidadesIndex.values()].sort((a, b) => compara(a.nome, b.nome))
+      .map(c => `<option value="${esc(c.nome)}/${esc(c.uf)}">`).join("");
+  }
+  return listas;
+}
+
+function acharCidade(texto) {
+  const t = norm(texto).trim();
+  if (!t) return null;
+  if (cidadesIndex.has(t)) return cidadesIndex.get(t);
+  const sem = [...cidadesIndex.entries()].filter(([k]) => k.split("/")[0] === t.split("/")[0]);
+  return sem.length === 1 ? sem[0][1] : null; // nome sem UF só vale se não houver outra cidade com o mesmo nome
+}
+
+async function mostrarCidade(texto) {
+  const [noCargoLista, lista2026] = await carregarInicio();
+  const alvo = $("#resultadoCidade");
+  const cid = acharCidade(texto);
+  if (!texto.trim()) { alvo.innerHTML = ""; return; }
+  if (!cid) {
+    const parecidas = [...cidadesIndex.values()].filter(c => norm(c.nome).startsWith(norm(texto).split("/")[0].trim())).slice(0, 8);
+    alvo.innerHTML = `<p class="vazio">Não achei "${esc(texto)}". ${parecidas.length ? "Você quis dizer: " + parecidas.map(c => `<a href="#" data-cidade="${esc(c.nome)}/${esc(c.uf)}">${esc(c.nome)}/${esc(c.uf)}</a>`).join(", ") + "?" : "Confira o nome e escolha da lista."}</p>`;
+    return;
+  }
+  try { localStorage.setItem("fa-cidade", `${cid.nome}/${cid.uf}`); } catch {}
+  history.replaceState(null, "", "#" + new URLSearchParams({ cidade: `${cid.nome}/${cid.uf}` }));
+  const nomeN = norm(cid.nome), b = { pref: [], vice: [], ver: [], gov: [], sen: [], depf: [], depe: [], pres: [], gov26: [], sen26: [], depf26: [], depe26: [] };
+  const vistos = new Set();
+  for (const lista of [pessoas, noCargoLista, lista2026]) for (const p of lista) for (const c of p.c) {
+    const chave = p.i + "|" + c[7];
+    if (vistos.has(chave)) continue;
+    let k = null;
+    if (noCargo(c)) {
+      if (c[0] === 2024 && c[2] === cid.uf && norm(c[3]) === nomeN) k = { "PREFEITO": "pref", "VICE-PREFEITO": "vice", "VEREADOR": "ver" }[c[1]];
+      else if (c[1] === "PRESIDENTE") k = "pres";
+      else if (c[2] === cid.uf) k = { "GOVERNADOR": "gov", "VICE-GOVERNADOR": "gov", "SENADOR": "sen", "1º SUPLENTE": "sen", "2º SUPLENTE": "sen", "DEPUTADO FEDERAL": "depf", "DEPUTADO ESTADUAL": "depe", "DEPUTADO DISTRITAL": "depe" }[c[1]];
+    } else if (c[0] === 2026 && c[2] === cid.uf && (c[5] === "Eleito" || c[5] === "2º turno")) {
+      k = { "GOVERNADOR": "gov26", "SENADOR": "sen26", "DEPUTADO FEDERAL": "depf26", "DEPUTADO ESTADUAL": "depe26", "DEPUTADO DISTRITAL": "depe26" }[c[1]];
+    }
+    if (k) { vistos.add(chave); b[k].push({ p, c }); }
+  }
+  const pref = PREF && PREF.find(x => x.uf === cid.uf && norm(x.nome) === nomeN);
+  const segundo = b.gov26.some(x => x.c[5] === "2º turno");
+  alvo.innerHTML = `
+    <section class="bloco">
+      <h2>${esc(cid.nome)}/${esc(cid.uf)}</h2>
+      ${pref ? `<div class="dinheiro"><p>Em ${pref.ano} a prefeitura gastou <b>${curto(pref.gasto)}</b>, ou <b>${reais(pref.hab)} por morador</b>. Isso é <b>${vezes(pref.razao)}</b> o que gastam, normalmente, as cidades de ${PORTES[pref.porte][2]}.${pref.receita && pref.royalties / pref.receita >= 0.1 ? ` ${Math.round(100 * pref.royalties / pref.receita)}% do dinheiro veio de royalties.` : ""}</p><button type="button" class="botao" data-cidade-ficha="${pref.ibge}">Ver para onde foi o dinheiro</button></div>` : ""}
+      ${grupo("Prefeito", b.pref)}${grupo("Vice-prefeito", b.vice)}${grupo("Vereadores", b.ver, false)}
+      ${(() => {
+        const pq = PQ_cache && PQ_cache.cidades[`${cid.uf}|${normNome(cid.nome)}`];
+        return pq ? `<h3>Compras com preço inflado</h3><div class="dinheiro"><p>Órgãos da cidade pagaram <b>${curto(pq[0])}</b> a mais que o normal em <b>${pq[1]}</b> de ${pq[2]} compras comparadas (remédio, combustível, parquinho, ar-condicionado).</p><button type="button" class="botao" data-ver-parq="${esc(cid.nome)}">Ver as compras</button></div>` : "";
+      })()}
+      ${blocoEmendasCidade(EMD_cache, cid.uf, cid.nome)}
+    </section>
+    <section class="bloco">
+      <h2>${esc(UFS[cid.uf] || cid.uf)}</h2>
+      ${grupo("Governador e vice", b.gov)}${grupo("Senadores", b.sen)}${grupo("Deputados federais", b.depf, false)}${grupo(cid.uf === "DF" ? "Deputados distritais" : "Deputados estaduais", b.depe, false)}
+    </section>
+    ${b.gov26.length + b.sen26.length + b.depf26.length + b.depe26.length ? `<section class="bloco">
+      <h2>Eleição de 2026 em ${esc(UFS[cid.uf] || cid.uf)}</h2>
+      <p class="pequena">${segundo ? "Governador vai ao 2º turno no dia 25 de outubro. " : ""}Os eleitos assumem em 2027.</p>
+      ${grupo(segundo ? "Governador: 2º turno" : "Governador eleito", b.gov26)}${grupo("Senadores eleitos", b.sen26)}${grupo("Deputados federais eleitos", b.depf26, false)}${grupo(cid.uf === "DF" ? "Deputados distritais eleitos" : "Deputados estaduais eleitos", b.depe26, false)}
+    </section>` : ""}
+    <section class="bloco">${grupo("Presidente", b.pres)}</section>
+    <p class="pequena">Toque em qualquer nome para ver a ficha completa, com o link de cada decisão. "Nada encontrado" quer dizer que a pessoa não aparece nas listas oficiais que o site consulta, e não que a ficha é garantidamente limpa (veja Como funciona).</p>`;
+}
+
+$("#buscaCidade").addEventListener("submit", () => mostrarCidade($("#cidade").value));
+$("#cidade").addEventListener("change", () => mostrarCidade($("#cidade").value));
+$("#aba-inicio").addEventListener("click", e => {
+  const ir = e.target.closest("[data-ir]"), cid = e.target.closest("[data-cidade]"), fic = e.target.closest("[data-cidade-ficha]"), pes = e.target.closest(".pessoa");
+  if (ir) { e.preventDefault(); trocarAba(ir.dataset.ir); }
+  else if (cid) { e.preventDefault(); $("#cidade").value = cid.dataset.cidade; mostrarCidade(cid.dataset.cidade); }
+  else if (fic) abrirCidade(+fic.dataset.cidadeFicha);
+  else if (e.target.closest("[data-ver-parq]")) { qform.q.value = e.target.closest("[data-ver-parq]").dataset.verParq; trocarAba("parquinhos"); }
+  else if (pes) abrirFicha(pes.dataset.i);
+});
+
+// ---------- emendas parlamentares ----------
+let EMD = null, EMD_cache = null;
+const carregarEmendas = () => (EMD ??= fetch("emendas.json").then(r => r.ok ? r.json() : null).then(e => (EMD_cache = e)).catch(() => null));
+const nomeAutor = cod => EMD_cache?.autores[cod] ? titulo(EMD_cache.autores[cod].n) : "";
+// mesma normalização do norm_nome() do coletar.py: chave de cidade "UF|NOME SEM ACENTO"
+const normNome = s => norm(s).toUpperCase().replace(/[^A-Z ]/g, " ").replace(/\s+/g, " ").trim();
+
+function linhaAlerta(a, mostrarCidade) {
+  const [fav, , valor, quando, desc, periodo, cod, cidade, link] = a;
+  const [uf, cid] = cidade.split("|");
+  return `<div class="caso alerta">
+    <div class="t"><b>${esc(titulo(fav))}</b><span class="chip s-final">Estava proibida de vender para o governo</span></div>
+    <div class="x">Recebeu <b>${reais(valor)}</b> de verba mandada por <b>${esc(nomeAutor(cod))}</b> (${esc(quando)}), quando estava proibida de vender para o governo: ${esc(desc)} (${esc(periodo)}).${mostrarCidade ? ` Fica em ${esc(titulo(cid))}/${esc(uf)}.` : ""}</div>
+    <div class="meta">O pagamento pode ser de contrato assinado antes da punição, o que a lei permite manter. Mesmo assim, vale conferir.</div>
+    <div class="lk"><a href="${esc(link)}" target="_blank" rel="noopener">Prova: a punição no Portal da Transparência</a><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(a[1])}" target="_blank" rel="noopener">Prova: o que a empresa recebeu do governo</a></div>
+  </div>`;
+}
+
+let COTA = null;
+const carregarCota = () => (COTA ??= fetch("cota.json").then(r => r.ok ? r.json() : null).catch(() => null));
+
+function blocoCota(d) {
+  return `<h3>Gastos do mandato que ${d.casa || "a Câmara"} pagou (${d.de} a ${d.ate})</h3>
+    <div class="valores num"><span>Total<br><b>${curto(d.t)}</b></span><span>Notas<br><b>${fmt(d.n)}</b></span><span class="pequena">Dinheiro público que o político gasta e ${d.casa || "a Câmara"} devolve: combustível, aluguel de carro, escritório, propaganda do mandato, consultoria. O nome oficial é "cota parlamentar".</span></div>
+    <p class="x"><b>Onde mais gastou:</b> ${d.cat.map(([c, v]) => `${esc(c.replace(/\.$/, ""))} (${curto(v)})`).join(", ")}.</p>
+    <p class="x"><b>Quem mais recebeu:</b> ${d.forn.slice(0, 6).map(([f, v]) => `${esc(titulo(f))} (${curto(v)})`).join(", ")}.</p>
+    ${d.al.map(a => `<div class="caso alerta"><div class="t"><b>${esc(titulo(a[0]))}</b><span class="chip s-final">Estava proibida de vender para o governo</span></div>
+      <div class="x">Recebeu <b>${reais(a[1])}</b> dos gastos do mandato (${esc(a[2])}), quando estava proibida de vender para o governo: ${esc(a[3])} (${esc(a[4])}).</div>
+      <div class="lk"><a href="${esc(a[5])}" target="_blank" rel="noopener">Prova: a punição</a>${a[6] ? `<a href="${esc(a[6])}" target="_blank" rel="noopener">Prova: uma das notas fiscais</a>` : ""}</div></div>`).join("")}`;
+}
+
+// ---------- empresas em que o político é sócio (Receita Federal) ----------
+const EMP = {};
+let EMPL = null;
+const carregarEmpresas = pd => (EMP[pd] ??= fetch(`empresas/${pd}.json`).then(r => r.ok ? r.json() : null).catch(() => null));
+const carregarListaEmpresas = () => (EMPL ??= fetch("empresas/lista.json").then(r => r.ok ? r.json() : null).catch(() => null));
+const dataBr = d => d ? d.split("-").reverse().join("/") : "";
+const mesBr = d => d.slice(5, 7) + "/" + d.slice(0, 4);
+const RECEITA = "https://arquivos.receitafederal.gov.br/index.php/s/YggdBLfdninEJX9";
+const ONDE = { cota: "Gastos do mandato", emenda: "Verba que a própria pessoa mandou", campanha: "Fundo eleitoral", prefeitura: "Compra da prefeitura", emenda_de: "Verba de outros políticos" };
+
+function pagamentoPropria([onde, forn, cnpj, v, de, ate, prova]) {
+  const [tipo, extra, cargo] = onde.split("|"), quando = mesBr(de) === mesBr(ate) ? mesBr(de) : `${mesBr(de)} a ${mesBr(ate)}`;
+  const texto = {
+    cota: `A cota do mandato pagou <b>${reais(v)}</b> a esta empresa (${quando}).`,
+    emenda: `Mandou <b>${reais(v)}</b> de verba do governo (emenda) para esta empresa (${quando}).`,
+    emenda_de: `Esta empresa recebeu <b>${reais(v)}</b> de verba do governo (emenda) mandada por <b>${esc(titulo(extra || ""))}</b> (${quando}).`,
+    campanha: `A campanha pagou <b>${reais(v)}</b> a esta empresa com fundo eleitoral ou partidário, que é dinheiro público (${quando}).`,
+    prefeitura: `A prefeitura de ${esc(extra)} comprou <b>${reais(v)}</b> desta empresa (${quando}), quando ocupava o cargo de ${esc((cargo || "").toLowerCase())} na cidade.`,
+  }[tipo];
+  return `<div class="caso alerta"><div class="t"><b>${esc(titulo(forn))}</b><span class="chip s-final">${ONDE[tipo]}</span></div>
+    <div class="x">${texto} Na data, a pessoa já aparecia no quadro de sócios e dirigentes da empresa no cadastro da Receita Federal.</div>
+    <div class="lk"><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: a empresa no Portal da Transparência</a>${/^https:\/\//.test(prova) ? `<a href="${esc(prova)}" target="_blank" rel="noopener">Prova: ${tipo === "cota" ? "a nota fiscal" : "a compra"}</a>` : ""}<a href="${RECEITA}" target="_blank" rel="noopener">Prova: quadro de sócios (Receita Federal)</a></div></div>`;
+}
+
+function blocoEmpresas(d, mes) {
+  const emp = ([cnpj, nome, papel, desde]) => `<div><b>${esc(nome || "Empresa sem nome no arquivo")}</b><span>${esc(papel)}${desde ? " desde " + dataBr(desde) : ""}</span><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: a empresa no governo</a></div>`;
+  return `${d.p.length ? `<h3>Dinheiro público que foi para empresas da pessoa (${reais(d.p.reduce((t, p) => t + p[3], 0))})</h3>${d.p.slice(0, 10).map(pagamentoPropria).join("")}
+    ${d.p.length > 10 ? `<details><summary>Ver os outros ${d.p.length - 10} pagamentos</summary>${d.p.slice(10).map(pagamentoPropria).join("")}</details>` : ""}` : ""}
+    <h3>Empresas e entidades em que aparece como sócio(a) ou dirigente (${d.e.length})</h3>
+    <div class="cands">${d.e.slice(0, 20).map(emp).join("")}</div>
+    ${d.e.length > 20 ? `<details><summary>Ver as outras ${d.e.length - 20}</summary><div class="cands">${d.e.slice(20).map(emp).join("")}</div></details>` : ""}
+    <p class="pequena">Do cadastro de sócios da Receita Federal${mes ? ` (${mesBr(mes + "-01")})` : ""}. A ligação exige o nome completo igual e os 6 números do meio do CPF que a Receita divulga, então homônimo não entra. A Receita mostra só os sócios de hoje: quem saiu da empresa não aparece. Ser sócio de empresa ou dirigir entidade não é crime.</p>`;
+}
+
+async function desenharEmpresasPropria() {
+  const l = await carregarListaEmpresas();
+  if (!l) { $("#presumo").textContent = "Ainda sem os dados da Receita."; return; }
+  const total = l.lista.reduce((t, x) => t + x[1], 0);
+  $("#presumo").innerHTML = `<b>${curto(total)}</b> de dinheiro público foi para empresas de <b>${fmt(l.lista.length)}</b> políticos, quando eles já apareciam como sócios ou dirigentes delas.`;
+  $("#ppropria").innerHTML = l.lista.slice(0, 200).map(([linha, v, ondes], i) => {
+    const [sq, urna, , cargo, uf, ue, , partido, , , ano] = linha;
+    return `<tr><td class="num">${i + 1}</td><td><a href="#" data-ficha-propria="${i}">${esc(titulo(urna))}</a></td><td>${esc(nomeCargo(cargo))}, ${esc(local([ano, cargo, uf, ue]))} (${ano})</td><td>${esc(partido)}</td><td class="r num">${curto(v)}</td><td>${ondes.map(o => ONDE[o]).join(", ")}</td></tr>`;
+  }).join("");
+}
+document.addEventListener("click", ev => {
+  const ir = ev.target.closest("[data-ir-aba]");
+  if (ir) { ev.preventDefault(); trocarAba(ir.dataset.irAba); scrollTo(0, 0); }
+  const a = ev.target.closest("[data-ficha-propria]");
+  if (!a || !EMPL) return;
+  ev.preventDefault();
+  EMPL.then(l => { const linha = l.lista[+a.dataset.fichaPropria][0]; if (!porId.has(linha[0])) pessoaDeLinha(linha); abrirFicha(linha[0]); });
+});
+
+let ENTL = null;
+const carregarEntidades = () => (ENTL ??= fetch("empresas/entidades.json").then(r => r.ok ? r.json() : null).catch(() => null));
+
+async function desenharEntidades() {
+  const l = await carregarEntidades();
+  if (!l) { $("#dresumo").textContent = "Ainda sem os dados da Receita."; return; }
+  const total = l.lista.reduce((t, x) => t + x[1], 0);
+  $("#dresumo").innerHTML = `<b>${curto(total)}</b> de verba foi para associações, fundações e cooperativas dirigidas por <b>${fmt(l.lista.length)}</b> políticos.`;
+  $("#dlista").innerHTML = l.lista.slice(0, 100).map(([linha, , pags]) => {
+    const [, urna, , cargo, uf, ue, , partido, sit, , ano] = linha;
+    return pags.map(([onde, ent, cnpj, v, de, ate, papel]) => {
+      const [tipo, autor] = onde.split("|"), quando = mesBr(de) === mesBr(ate) ? mesBr(de) : `${mesBr(de)} a ${mesBr(ate)}`;
+      return `<div class="caso"><div class="t"><b>${esc(titulo(ent))}</b><span class="chip">${esc(papel || "Dirigente")}: ${esc(titulo(urna))}</span></div>
+        <div class="x">Recebeu <b>${reais(v)}</b> de verba ${tipo === "emenda" ? `mandada pelo próprio ${esc(titulo(urna))}` : `mandada por <b>${esc(titulo(autor || ""))}</b>`} (${quando}). Última candidatura de ${esc(titulo(urna))} (${esc(partido)}): ${esc(nomeCargo(cargo).toLowerCase())} em ${esc(local([ano, cargo, uf, ue]))}, ${ano}, ${esc(sit.toLowerCase())}.</div>
+        <div class="lk"><a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: o que a entidade recebeu do governo</a><a href="${RECEITA}" target="_blank" rel="noopener">Prova: quadro de dirigentes (Receita Federal)</a></div></div>`;
+    }).join("");
+  }).join("");
+}
+
+function blocoEmendasAutor(e, cod) {
+  const a = e.autores[cod];
+  const als = e.alertas.filter(x => x[6] === cod);
+  const pix = a.t ? Math.round(100 * a.pix / a.t) : 0;
+  return `<h3>Verba do governo que mandou para cidades e entidades (${esc(a.de)} a ${esc(a.ate)})</h3>
+    <div class="valores num"><span>Pagas<br><b>${curto(a.t)}</b></span>${pix ? `<span>Verba Pix<br><b>${pix}%</b></span>` : ""}<span class="pequena">Verba Pix é o dinheiro que cai direto no caixa da prefeitura ou do estado, sem dizer em que vai ser gasto. O nome oficial disso tudo é "emenda parlamentar".</span></div>
+    <p class="x"><b>Para onde mais foi:</b> ${a.cid.slice(0, 6).map(([c, v]) => `${esc(c)} (${curto(v)})`).join(", ")}.</p>
+    <p class="x"><b>Quem mais recebeu:</b> ${a.fav.slice(0, 5).map(([f, v]) => `${esc(titulo(f))} (${curto(v)})`).join(", ")}.</p>
+    ${als.length ? `<h3>Verba paga a quem estava proibido de vender para o governo (${als.length})</h3>${als.map(x => linhaAlerta(x, true)).join("")}` : ""}`;
+}
+
+function blocoEmendasCidade(e, uf, nome) {
+  const chave = `${uf}|${normNome(nome)}`, c = e && e.cidades[chave];
+  if (!c) return "";
+  const als = e.alertas.filter(x => x[7] === chave);
+  const autor = ([cod, v]) => {
+    const a = e.autores[cod], sq = a && a.sqs.find(s => porId.has(s));
+    return sq ? `<a href="#" data-ficha-emenda="${esc(sq)}">${esc(titulo(a.n))}</a> (${curto(v)})` : `${esc(titulo(a ? a.n : cod))} (${curto(v)})`;
+  };
+  return `<h3>Verba que deputados e senadores mandaram para cá desde 2019</h3>
+    <div class="dinheiro"><p>Prefeitura, empresas e entidades da cidade receberam <b>${curto(c.t)}</b> em verbas escolhidas por deputados e senadores (as "emendas").</p></div>
+    <p class="x"><b>Quem mais mandou:</b> ${c.aut.slice(0, 8).map(autor).join(", ")}.</p>
+    <p class="x"><b>Quem mais recebeu:</b> ${c.fav.slice(0, 5).map(([f, v]) => `${esc(titulo(f))} (${curto(v)})`).join(", ")}.</p>
+    ${als.length ? `<h3>Verba paga a quem estava proibido de vender para o governo (${als.length})</h3>${als.map(x => linhaAlerta(x, false)).join("")}` : ""}`;
+}
+
+async function desenharEmendas() {
+  const e = await carregarEmendas();
+  EMD_cache = e;
+  if (!e) { $("#elista").innerHTML = `<div class="vazio">Não foi possível carregar as emendas.</div>`; return; }
+  const total = e.alertas.reduce((t, a) => t + a[2], 0);
+  $("#eresumo").innerHTML = `<b>${fmt(e.alertas.length)}</b> pagamentos de verba, somando <b>${curto(total)}</b>, foram para empresas e entidades que estavam proibidas de vender para o governo no mês do pagamento.`;
+  $("#elista").innerHTML = e.alertas.map(a => linhaAlerta(a, true)).join("");
+  const autores = Object.entries(e.autores).filter(([, a]) => a.sqs.length).sort((a, b) => b[1].t - a[1].t).slice(0, 100);
+  $("#eautores").innerHTML = autores.map(([cod, a], i) => {
+    const sq = a.sqs.find(s => porId.has(s));
+    return `<tr><td class="num">${i + 1}</td><td>${sq ? `<a href="#" data-ficha-emenda="${esc(sq)}">${esc(titulo(a.n))}</a>` : esc(titulo(a.n))}</td><td class="r num">${curto(a.t)}</td><td class="r num">${a.t ? Math.round(100 * a.pix / a.t) : 0}%</td><td>${a.cid.slice(0, 2).map(([c]) => esc(c)).join(", ")}</td></tr>`;
+  }).join("");
+  history.replaceState(null, "", "#aba=emendas");
+}
+
+document.addEventListener("click", ev => {
+  const a = ev.target.closest("[data-ficha-emenda]");
+  if (a) { ev.preventDefault(); abrirFicha(a.dataset.fichaEmenda); }
+});
+
+// ---------- pago a mais: cada produto contra o preço normal do mesmo produto ----------
+let PQ = null, PQ_cache = null, qmostrando = 40;
+const carregarParq = () => (PQ ??= fetch("precos.json").then(r => r.ok ? r.json() : null).then(d => (PQ_cache = d)).catch(() => null));
+const qform = $("#qfiltros");
+
+async function desenharParquinhos() {
+  const d = await carregarParq();
+  if (!d) { $("#qresumo").textContent = "Os preços ainda estão sendo coletados. Volte daqui a pouco."; return; }
+  if (!qform.cat.options[1]) {
+    qform.cat.innerHTML += Object.entries(d.cats).filter(([c]) => d.contagem[c]).map(([c, n]) => `<option value="${esc(c)}">${esc(n)}</option>`).join("");
+    qform.uf.innerHTML += [...new Set(d.itens.map(i => i[10]))].sort((a, b) => compara(UFS[a] || a, UFS[b] || b)).map(u => `<option value="${esc(u)}">${esc(UFS[u] || u)}</option>`).join("");
+    const h = new URLSearchParams(location.hash.slice(1));
+    if (h.get("qq")) qform.q.value = h.get("qq");
+  }
+  const f = Object.fromEntries(new FormData(qform)), q = norm(f.q || "").trim();
+  const lista = d.itens.filter(i => (!f.cat || i[0] === f.cat) && (!f.uf || i[10] === f.uf) && (!q || norm(i[9] + " " + i[1]).includes(q)));
+  const soma = lista.reduce((t, i) => t + i[6], 0);
+  const total = f.cat ? d.contagem[f.cat] : Object.values(d.contagem).reduce((a, b) => a + b, 0);
+  $("#qresumo").innerHTML = `De ${fmt(total)} compras comparadas, <b>${fmt(lista.length)}</b>${f.uf || q ? " (com esses filtros)" : ""} custaram mais que o dobro do normal. Somando, <b>${curto(soma)}</b> pagos a mais.`;
+  $("#qlista").innerHTML = lista.slice(0, qmostrando).map(i => {
+    const [cat, prod, desc, unit, qtd, vz, mais, normal, amostras, mun, uf, orgao, data, forn, cnpj, url, pref, ondeNormal, modalidade] = i;
+    const fichaPref = pref && porId.has(pref[2]) ? `<a href="#" data-ficha-emenda="${esc(pref[2])}">Ficha do prefeito</a>` : "";
+    const centavos = unit < 100;
+    return `<div class="caso alerta">
+      <div class="t"><b>${esc(mun)}/${esc(uf)}</b><span class="chip s-final">${vz.toLocaleString("pt-BR")} vezes o normal</span></div>
+      <div class="x"><b>${esc(prod)}</b> por <b>${reais(unit, centavos)}</b> cada${qtd > 1 ? ` (${fmt(Math.round(qtd))} unidades)` : ""}. O normal é <b>${reais(normal, centavos)}</b>, o preço do meio de ${fmt(amostras)} compras${cat === "combustivel" ? ` em ${esc(UFS[uf] || uf)}` : ondeNormal ? " " + esc(ondeNormal) : ""}. Pago a mais: <b>${reais(mais)}</b>.</div>
+      <div class="meta">${modalidade === "Dispensa" || modalidade === "Inexigibilidade" ? `Compra sem licitação (${modalidade.toLowerCase()}). ` : ""}Comprado por ${esc(orgao)} em ${esc(data.split("-").reverse().join("/"))}${forn ? ", de " + esc(forn) : ""}${pref ? `. Prefeito na época: ${esc(pref[0])} (${esc(pref[1])})` : ""}.</div>
+      <details><summary>Ler a descrição do produto</summary><p>${esc(desc)}</p></details>
+      <div class="lk"><a href="${esc(url)}" target="_blank" rel="noopener">Prova: a compra no portal de compras do governo</a>${cnpj ? `<a href="https://portaldatransparencia.gov.br/pessoa-juridica/${esc(cnpj)}" target="_blank" rel="noopener">Prova: o que a empresa recebe do governo</a>` : ""}${fichaPref}</div>
+    </div>`;
+  }).join("") || `<div class="vazio">Nenhuma compra acima do dobro do normal com esses filtros.</div>`;
+  $("#qmais").hidden = qmostrando >= lista.length;
+  history.replaceState(null, "", "#aba=parquinhos" + (f.q ? "&qq=" + encodeURIComponent(f.q) : ""));
+}
+let qespera;
+qform.addEventListener("input", () => { clearTimeout(qespera); qespera = setTimeout(() => { qmostrando = 40; desenharParquinhos(); }, 150); });
+$("#qmais").addEventListener("click", () => { qmostrando += 40; desenharParquinhos(); });
+
+let espera;
+form.addEventListener("input", e => { clearTimeout(espera); espera = setTimeout(atualizar, e.target.name === "q" ? 200 : 0); });
+$("#ordem").addEventListener("change", atualizar);
+$("#limpar").addEventListener("click", () => { form.reset(); atualizar(); });
+$("#mais").addEventListener("click", () => { mostrando += PAGINA; desenharLista(lerFiltros()); });
+$("#lista").addEventListener("click", e => { const b = e.target.closest(".item"); if (b) abrirFicha(b.dataset.i); });
+document.querySelectorAll("[data-aba]").forEach(b => b.addEventListener("click", () => trocarAba(b.dataset.aba)));
+document.querySelectorAll("[data-po]").forEach(b => b.addEventListener("click", () => { ordemPartido = b.dataset.po; atualizar(); }));
+$("#maisFiltros").addEventListener("click", e => {
+  const aberto = form.classList.toggle("mais");
+  e.currentTarget.setAttribute("aria-expanded", aberto);
+  e.currentTarget.textContent = aberto ? "Menos filtros" : "Mais filtros";
+});
+$("#abrirFiltros").addEventListener("click", e => {
+  const aberto = form.classList.toggle("fechado") === false;
+  e.currentTarget.setAttribute("aria-expanded", aberto);
+});
+addEventListener("hashchange", () => { if (D && !$("#ficha").open) location.reload(); });
+iniciar().catch(() => { $("#total").textContent = "Não foi possível carregar os dados. Tente recarregar a página."; });
+</script>
+</body>
+</html>
