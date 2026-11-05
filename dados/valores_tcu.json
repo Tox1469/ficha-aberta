@@ -657,6 +657,15 @@
 "tr": "9.2. condenar o Sr. Carlos Alberto de Azevedo Camurça ao pagamento das quantias abaixo especificadas, com a fixação do prazo de 15 (quinze) dias, a contar da notificação, para que comprove, perante este Tribunal (art. 214, III, \"a\", do RI/TCU) , o recolhimento da dívida aos cofres do Tesouro Nacional atualizada monetariamente e acrescida dos juros de mora, calculados a partir das datas discriminadas, até a data do recolhimento, na forma prevista na legislação em vigor: DATA DA OCORRÊNCIA VALOR ORIGINAL (R$) 2/4/2003 36.000,00 23/4/2003 18.000,00 28/5/2003 18.000,00 27/6/2003 18.000,00 30/7/200"
 }
 },
+"10444/2022-1C": {
+"ANILTON BASTOS PEREIRA": {
+"deb": 100993.08,
+"mul": 0.0,
+"sol": true,
+"ant": false,
+"tr": "9.2. julgar irregulares, nos termos dos arts. 1º, I, 16, III, \"c\", 19 e 23, III, da Lei 8.443/1992, as contas do Sr. Anilton Bastos Pereira, condenando-o, solidariamente com a empresa José Carlos dos Santos Transportes - ME ao pagamento da quantia de R$ 100.993,08 (cem mil novecentos e noventa e três reais e oito centavos), atualizada monetariamente e acrescida dos juros de mora, calculada a partir de 31/10/2014 até a data da efetiva quitação do débito, fixando-lhes o prazo de 15 (quinze) dias para que comprovem, perante o Tribunal, o seu recolhimento aos cofres do FNDE, nos termos do art. 23,"
+}
+},
 "10445/2019-1C": {
 "ANTONIO BARBOSA DOS SANTOS": {
 "deb": 148662.36,
@@ -3641,6 +3650,15 @@
 },
 "1501/2021-PL": {
 "ANA PAULA DA SILVA": null
+},
+"1507/2026-2C": {
+"ADIEL MOURA DE SOUZA": {
+"deb": 233351.4,
+"mul": 20000.0,
+"sol": true,
+"ant": false,
+"tr": "9.1. julgar irregulares as contas de Adiel Moura de Souza e JR Serviços Navais Ltda., condenando-os solidariamente ao pagamento do valor de R$ 233.351,40, atualizado monetariamente e acrescido dos juros de mora, calculados a partir de 5/12/2016 até a data da efetiva quitação do débito, fixando-lhes o prazo de quinze dias, para que comprovem, perante o Tribunal, o recolhimento dos referidos valores aos cofres do Tesouro Nacional;  […] 9.2. aplicar a Adiel Moura de Souza e JR Serviços Navais Ltda. multas individuais no valor de R$ 20.000,00, fixando-lhes o prazo de quinze dias, a contar das notificações, para que comprovem, perante o Tribunal (art. 214, III, \"a\", do Regimento Interno do TCU), o recolhimento das dívidas aos cofres "
+}
 },
 "1508/2007-1C": {
 "ANTONIO FERNANDO PEREIRA DE CARVALHO": {
@@ -8382,13 +8400,6 @@
 }
 },
 "2676/2022-2C": {
-"JOAO ANTONIO SALGADO RIBEIRO": {
-"deb": 0.0,
-"mul": 25000.0,
-"sol": false,
-"ant": false,
-"tr": "9.4.2. João Antônio Salgado Ribeiro e Vito Ardito Lerario, na condição de prefeitos do Município de Pindamonhangaba/SP nos períodos de 1º/1/2009 a 31/12/2012 e de 1º/1/2013 a 31/12/2016, respectivamente; e Ana Emília Gaspar, na condição de secretária de saúde e promoção social do Município de Pindam […] 9.4.3. Isael Domingues e Sandra Maria Carneiro Tutihashi, na condição de secretário e de secretária de saúde e assistência social do Município de Pindamonhangaba/SP nos períodos de 18/3/2013 a 7/10/2013 e 1/11/2013 a 31/7/2016, respectivamente; e Rodolfo Brockhof, na condição de secretários de finan"
-},
 "VITO ARDITO LERARIO": {
 "deb": 0.0,
 "mul": 25000.0,
@@ -8402,6 +8413,13 @@
 "sol": false,
 "ant": false,
 "tr": "9.4.3. Isael Domingues e Sandra Maria Carneiro Tutihashi, na condição de secretário e de secretária de saúde e assistência social do Município de Pindamonhangaba/SP nos períodos de 18/3/2013 a 7/10/2013 e 1/11/2013 a 31/7/2016, respectivamente; e Rodolfo Brockhof, na condição de secretários de finan"
+},
+"JOAO ANTONIO SALGADO RIBEIRO": {
+"deb": 0.0,
+"mul": 25000.0,
+"sol": false,
+"ant": false,
+"tr": "9.4.2. João Antônio Salgado Ribeiro e Vito Ardito Lerario, na condição de prefeitos do Município de Pindamonhangaba/SP nos períodos de 1º/1/2009 a 31/12/2012 e de 1º/1/2013 a 31/12/2016, respectivamente; e Ana Emília Gaspar, na condição de secretária de saúde e promoção social do Município de Pindam […] 9.4.3. Isael Domingues e Sandra Maria Carneiro Tutihashi, na condição de secretário e de secretária de saúde e assistência social do Município de Pindamonhangaba/SP nos períodos de 18/3/2013 a 7/10/2013 e 1/11/2013 a 31/7/2016, respectivamente; e Rodolfo Brockhof, na condição de secretários de finan"
 }
 },
 "268/2002-1C": {
@@ -8474,6 +8492,15 @@
 "tr": "9.4.5. Sr. Antônio Eustáquio de Oliveira,(CPF omitido)solidariamente com o Sr. Pedro de Araújo Pinto,(CPF omitido): Data da Ocorrência Valor do Débito 26/06/1995 12.092,00  […] 9.5.5. Pedro de Araújo Pinto: R$ 6.000,00 (seis mil reais); "
 }
 },
+"2690/2025-1C": {
+"ROSANGELA NOGUEIRA DA SILVA": {
+"deb": 844403.54,
+"mul": 90000.0,
+"sol": true,
+"ant": false,
+"tr": "9.1. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alínea \"c\", da Lei 8.443/1992 c/c os arts. 19 e 23, inciso III, da mesma lei, as contas de Hernando Dias de Macedo, Rosângela Nogueira da Silva e Alexandre Carvalho Costa, condenando-os, solidariamente, ao pagamento de R$ 844.403,54 (oitocentos e quarenta e quatro mil quatrocentos e três reais e cinquenta e quatro centavos), atualizados monetariamente e acrescidos de juros de mora calculados a partir de 26/4/2012 até a data da efetiva quitação do débito, fixando o prazo de 15 (quinze) dias para que comprovem, perante o […] 9.2. aplicar-lhes, individualmente, a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU, no valor de R$ 90.000,00 (noventa mil reais), fixando o prazo de 15 (quinze) dias, a contar da notificação, para que comprovem, perante o Tribunal (art. 214, III, alínea"
+}
+},
 "2692/2025-2C": {
 "LUCIANO HENRIQUE SORDINE PEREIRA": {
 "deb": 354151.4,
@@ -8542,19 +8569,19 @@
 }
 },
 "2707/2026-1C": {
-"LEONARDO DICSON SANCHEZ BETIN": {
-"deb": 130412.39,
-"mul": 50000.0,
-"sol": false,
-"ant": false,
-"tr": "9.2. julgar irregulares as contas do Sr. Jarbas da Silva Martini e condená-lo ao pagamento da quantia a seguir especificada, com a fixação de prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno do TCU), o recolhimento da dívida ao Fundo Nacional de Desenvolvimento da Educação, atualizada monetariamente e acrescida dos juros de mora, calculados a partir das datas discriminadas, até a data do recolhimento, na forma prevista na legislação em vigor, com fundamento nos arts. 1º, inciso I, 16, III, alíneas \"a\" e […] 9.5. aplicar ao Sr. Leonardo Dicson Sanchez Betin multa prevista no art. 58, inciso II, da Lei 8.443/1992 c/c o art. 268 do Regimento Interno do TCU, no valor de R$ 50.000,00 (cinquenta mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribuna"
-},
 "JARBAS DA SILVA MARTINI": {
 "deb": 130412.39,
 "mul": 80000.0,
 "sol": false,
 "ant": false,
 "tr": "9.2. julgar irregulares as contas do Sr. Jarbas da Silva Martini e condená-lo ao pagamento da quantia a seguir especificada, com a fixação de prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno do TCU), o recolhimento da dívida ao Fundo Nacional de Desenvolvimento da Educação, atualizada monetariamente e acrescida dos juros de mora, calculados a partir das datas discriminadas, até a data do recolhimento, na forma prevista na legislação em vigor, com fundamento nos arts. 1º, inciso I, 16, III, alíneas \"a\" e […] 9.3. aplicar ao Sr. Jarbas da Silva Martini multa prevista no art. 57 da Lei 8.443/1992, no valor de R$ 80.000,00 (oitenta mil reais), com a fixação do prazo de quinze dias, a contar da notificação, para comprovar, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno), o r"
+},
+"LEONARDO DICSON SANCHEZ BETIN": {
+"deb": 130412.39,
+"mul": 50000.0,
+"sol": false,
+"ant": false,
+"tr": "9.2. julgar irregulares as contas do Sr. Jarbas da Silva Martini e condená-lo ao pagamento da quantia a seguir especificada, com a fixação de prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno do TCU), o recolhimento da dívida ao Fundo Nacional de Desenvolvimento da Educação, atualizada monetariamente e acrescida dos juros de mora, calculados a partir das datas discriminadas, até a data do recolhimento, na forma prevista na legislação em vigor, com fundamento nos arts. 1º, inciso I, 16, III, alíneas \"a\" e […] 9.5. aplicar ao Sr. Leonardo Dicson Sanchez Betin multa prevista no art. 58, inciso II, da Lei 8.443/1992 c/c o art. 268 do Regimento Interno do TCU, no valor de R$ 50.000,00 (cinquenta mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribuna"
 }
 },
 "2708/2025-2C": {
@@ -9428,14 +9455,14 @@
 }
 },
 "2941/2025-1C": {
-"MIGUEL VIEIRA MACHADO NETO": {
+"LINDEVAL AUGUSTO MOTTA": {
 "deb": 0.0,
 "mul": 10000.0,
 "sol": false,
 "ant": false,
 "tr": "9.5. aplicar aos responsáveis Srs. Gilberto Tobias Morato, Miguel Vieira Machado Neto e Lindeval Augusto Motta a multa prevista no art. 58, inciso I, da Lei 8.443/1992 c/c o art. 268, inciso I, do Regimento Interno/TCU, no valor individual de R$ 10.000,00, fixando-lhes o prazo de quinze dias, a cont"
 },
-"LINDEVAL AUGUSTO MOTTA": {
+"MIGUEL VIEIRA MACHADO NETO": {
 "deb": 0.0,
 "mul": 10000.0,
 "sol": false,
@@ -9773,19 +9800,19 @@
 }
 },
 "3061/2025-2C": {
-"JOAO LUIZ CARVALHO DA SILVA": {
-"deb": 28018.68,
-"mul": 10000.0,
-"sol": true,
-"ant": false,
-"tr": "9.4. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"b\" e \"c\", da Lei 8.443/1992, c/c os arts. 19 e 23, inciso III, da mesma Lei, as contas dos responsáveis José Medeiros de Noronha Pessoa, Francisco Pessoa da Silva e João Luiz Carvalho da Silva, e condenar o espólio de Francisco Pessoa da Silva ou, caso já tenha havido a partilha, os respectivos sucessores, até o limite do patrimônio a eles transferido, solidariamente com os responsáveis José Medeiros de Noronha Pessoa e João Luiz Carvalho da Silva, ao pagamento das importâncias a seguir especificadas, atualiza […] 9.5. aplicar individualmente aos responsáveis José Medeiros de Noronha Pessoa e João Luiz Carvalho da Silva, a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU, no valor de R$ 10.000,00, fixando-lhes o prazo de quinze dias, a contar da notificação, para que"
-},
 "FRANCISCO PESSOA DA SILVA": {
 "deb": 28018.68,
 "mul": 0.0,
 "sol": true,
 "ant": false,
 "tr": "9.4. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"b\" e \"c\", da Lei 8.443/1992, c/c os arts. 19 e 23, inciso III, da mesma Lei, as contas dos responsáveis José Medeiros de Noronha Pessoa, Francisco Pessoa da Silva e João Luiz Carvalho da Silva, e condenar o espólio de Francisco Pessoa da Silva ou, caso já tenha havido a partilha, os respectivos sucessores, até o limite do patrimônio a eles transferido, solidariamente com os responsáveis José Medeiros de Noronha Pessoa e João Luiz Carvalho da Silva, ao pagamento das importâncias a seguir especificadas, atualiza"
+},
+"JOAO LUIZ CARVALHO DA SILVA": {
+"deb": 28018.68,
+"mul": 10000.0,
+"sol": true,
+"ant": false,
+"tr": "9.4. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"b\" e \"c\", da Lei 8.443/1992, c/c os arts. 19 e 23, inciso III, da mesma Lei, as contas dos responsáveis José Medeiros de Noronha Pessoa, Francisco Pessoa da Silva e João Luiz Carvalho da Silva, e condenar o espólio de Francisco Pessoa da Silva ou, caso já tenha havido a partilha, os respectivos sucessores, até o limite do patrimônio a eles transferido, solidariamente com os responsáveis José Medeiros de Noronha Pessoa e João Luiz Carvalho da Silva, ao pagamento das importâncias a seguir especificadas, atualiza […] 9.5. aplicar individualmente aos responsáveis José Medeiros de Noronha Pessoa e João Luiz Carvalho da Silva, a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU, no valor de R$ 10.000,00, fixando-lhes o prazo de quinze dias, a contar da notificação, para que"
 }
 },
 "3062/2025-2C": {
@@ -10281,19 +10308,19 @@
 }
 },
 "3228/2022-1C": {
-"HUMBERTO GOMES RAMOS": {
-"deb": 0.0,
-"mul": 10000.0,
-"sol": false,
-"ant": false,
-"tr": "9.5. aplicar ao Sr. Humberto Gomes Ramos a multa prevista no art. 58, inciso I, da Lei 8.443/1992, c/c o art. 268, inciso I, do Regimento Interno do TCU, no valor de R$ 10.000,00 (dez mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante este Tribunal, o"
-},
 "RITA DE CASSIA CAMPOS SOUZA": {
 "deb": 117571.19,
 "mul": 20000.0,
 "sol": false,
 "ant": false,
 "tr": "9.3. condenar a Sra. Rita de Cássia Campos Souza, com base nos arts. 19, caput , e 23, inciso III, da Lei 8.443/1992, ao pagamento da quantia a seguir discriminada, com a fixação do prazo de quinze dias, a contar da notificação, para comprovar, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno), o recolhimento da dívida aos cofres do Fundo Nacional de Desenvolvimento da Educação, atualizada monetariamente e acrescida dos juros de mora, calculados a partir da respectiva data de ocorrência até a data do recolhimento, na forma prevista na legislação em vigor: Data Valor ( […] 9.4. aplicar a Sra. Rita de Cássia Campos Souza a multa prevista no art. 57 da Lei 8.443/1992, c/c art. 267 do Regimento Interno do TCU, no valor de R$ 20.000,00 (vinte mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante este Tribunal, o recolhime"
+},
+"HUMBERTO GOMES RAMOS": {
+"deb": 0.0,
+"mul": 10000.0,
+"sol": false,
+"ant": false,
+"tr": "9.5. aplicar ao Sr. Humberto Gomes Ramos a multa prevista no art. 58, inciso I, da Lei 8.443/1992, c/c o art. 268, inciso I, do Regimento Interno do TCU, no valor de R$ 10.000,00 (dez mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante este Tribunal, o"
 }
 },
 "3229/2009-1C": {
@@ -11500,6 +11527,9 @@
 "tr": "9.1. julgar irregulares as presentes contas, com fundamento nos arts. 1º, inciso I, e 16, inciso III, alínea \"a\" e \"c\", da Lei nº 8.443, de 16 de julho de 1992, condenando o Sr. Jesuíto Dias Tavares ao pagamento da quantia de R$ 28.403,20 (vinte e oito mil, quatrocentos e três reais e vinte centavos), atualizada monetariamente e acrescida dos juros de mora, calculados a partir de 9/1/2006, até a efetiva quitação do débito, fixando-lhe o prazo de 15 (quinze) dias, a contar da notificação, para que comprove, perante o Tribunal, o recolhimento da dívida aos cofres do Tesouro Nacional, nos termos  […] 9.2. aplicar ao Sr. Jesuíto Dias Tavares a multa prevista no art. 57 da Lei nº 8.443, de 1992, no valor de R$ 5.000,00 (cinco mil reais), fixando-lhe o prazo de 15 (quinze) dias, a contar da notificação, para que comprove, perante o Tribunal, o recolhimento da referida quantia aos cofres do Tes"
 }
 },
+"3712/2022-1C": {
+"ANILTON BASTOS PEREIRA": null
+},
 "3715/2009-1C": {
 "VICENTE JOAQUIM BOGO": null
 },
@@ -11651,14 +11681,14 @@
 }
 },
 "3778/2025-2C": {
-"JOSE IZIDRO NETO": {
+"JOSE CARLOS FERNANDES CHACON": {
 "deb": 4350206.76,
 "mul": 500000.0,
 "sol": false,
 "ant": false,
 "tr": "9.2. julgar irregulares as contas de Jorge Abissamra, Acir Fillo dos Santos, José Izidro Neto e José Carlos Fernandes Chacon, condenando-os ao pagamento das importâncias abaixo especificadas, fixando-lhes o prazo de 15 (quinze) dias, a contar da notificação, para que comprovem, perante o Tribunal (art. 214, III, \"a\", do Regimento Interno), o recolhimento das referidas quantias aos cofres do Tesouro Nacional, atualizadas monetariamente e acrescidas dos juros de mora, calculados a contar das datas indicadas até o dia do efetivo recolhimento do débito, na forma prevista na legislação em vigor: Da […] 9.3. aplicar aos responsáveis, individualmente, Jorge Abissamra, Acir Fillo dos Santos, José Izidro Neto e José Carlos Fernandes Chacon a multa prevista no art. 57 da Lei 8.443/1992, no valor de R$ 500.000,00 (quinhentos mil reais), fixando-lhes o prazo de 15 (quinze) dias, a contar da notifica"
 },
-"JOSE CARLOS FERNANDES CHACON": {
+"JOSE IZIDRO NETO": {
 "deb": 4350206.76,
 "mul": 500000.0,
 "sol": false,
@@ -12182,19 +12212,19 @@
 }
 },
 "3970/2026-2C": {
-"ELIZIO FERNANDES RODRIGUES SIMOES": {
-"deb": 161843.41,
-"mul": 25000.0,
-"sol": false,
-"ant": false,
-"tr": "9.3. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"a\" e \"c\", 19 e 23, inciso III, da Lei 8.443/1992, as contas de Elízio Fernandes Rodrigues Simões, condenando-o ao pagamento da importância a seguir especificada, atualizada monetariamente e acrescida dos juros de mora, calculada a partir da data discriminada até a data da efetiva quitação do débito, fixando-lhe o prazo de quinze dias, para que comprove, perante o Tribunal, o recolhimento da referida quantia aos cofres do Fundo Nacional de Desenvolvimento da Educação, nos termos do art. 23, inciso III, alínea \" […] 9.4. aplicar ao responsável Elizio Fernandes Rodrigues Simoes a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU no valor de R$ 25.000,00 (vinte e cinco mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante o Tr"
-},
 "MANOELITO ARGOLO DOS SANTOS JUNIOR": {
 "deb": 0.0,
 "mul": 15000.0,
 "sol": false,
 "ant": false,
 "tr": "9.5. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alínea \"a\", 19, parágrafo único, e 23, inciso III, da Lei 8.443/1992, as contas de Manoelito Argolo dos Santos Junior, aplicando-lhe a multa prevista no art. 58, inciso II, da Lei 8.443/92, no valor de 15.000,00 (quinze mil "
+},
+"ELIZIO FERNANDES RODRIGUES SIMOES": {
+"deb": 161843.41,
+"mul": 25000.0,
+"sol": false,
+"ant": false,
+"tr": "9.3. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"a\" e \"c\", 19 e 23, inciso III, da Lei 8.443/1992, as contas de Elízio Fernandes Rodrigues Simões, condenando-o ao pagamento da importância a seguir especificada, atualizada monetariamente e acrescida dos juros de mora, calculada a partir da data discriminada até a data da efetiva quitação do débito, fixando-lhe o prazo de quinze dias, para que comprove, perante o Tribunal, o recolhimento da referida quantia aos cofres do Fundo Nacional de Desenvolvimento da Educação, nos termos do art. 23, inciso III, alínea \" […] 9.4. aplicar ao responsável Elizio Fernandes Rodrigues Simoes a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU no valor de R$ 25.000,00 (vinte e cinco mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante o Tr"
 }
 },
 "3971/2026-2C": {
@@ -14327,19 +14357,19 @@
 "ARTEMES SILVA DE OLIVEIRA": null
 },
 "4825/2025-2C": {
-"NORMANDA TORRES SENA": {
-"deb": 45350.37,
-"mul": 0.0,
-"sol": true,
-"ant": false,
-"tr": "9.1.1. Sr. Natã Garcia Hora em solidariedade com a Sra. Normanda Torres Sena: Data Valor (R$) 6/6/2016 100,07 6/6/2016 133,43 6/6/2016 41,90 6/6/2016 55,86 6/6/2016 51,81 6/6/2016 69,08 1º/7/2016 1.111,50 7/7/2016 133,43 7/7/2016 100,07 13/7/2016 1.545,40 13/7/2016 720,79 14/7/2016 1.500,00 15/7/2016 330,00 3/8/2016 503,50 16/8/2016 100,00 17/8/2016 228,00 17/11/2016 330,00 30/11/2016 227,90 1º/12/2016 1.500,00 16/12/2016 227,90 27/12/2016 1.786,00 29/12/2016 6.000,00 29/12/2016 7.720,25 30/12/2016 2.754,80 30/12/2016 150,00 30/12/2016 95,20 5/4/2016 1.745,00 13/4/2016 820,00 19/4/2016 2.358,2"
-},
 "NATA GARCIA HORA": {
 "deb": 45350.37,
 "mul": 25000.0,
 "sol": true,
 "ant": false,
 "tr": "9.1.1. Sr. Natã Garcia Hora em solidariedade com a Sra. Normanda Torres Sena: Data Valor (R$) 6/6/2016 100,07 6/6/2016 133,43 6/6/2016 41,90 6/6/2016 55,86 6/6/2016 51,81 6/6/2016 69,08 1º/7/2016 1.111,50 7/7/2016 133,43 7/7/2016 100,07 13/7/2016 1.545,40 13/7/2016 720,79 14/7/2016 1.500,00 15/7/2016 330,00 3/8/2016 503,50 16/8/2016 100,00 17/8/2016 228,00 17/11/2016 330,00 30/11/2016 227,90 1º/12/2016 1.500,00 16/12/2016 227,90 27/12/2016 1.786,00 29/12/2016 6.000,00 29/12/2016 7.720,25 30/12/2016 2.754,80 30/12/2016 150,00 30/12/2016 95,20 5/4/2016 1.745,00 13/4/2016 820,00 19/4/2016 2.358,2 […] 9.2.1. ao Sr. Natã Garcia Hora e à Sra. Normanda Sena Torres a multa no valor de R$ 15.000,00 (quinze mil reais), com base no art. 57 da Lei 8.443/1992;  […] 9.2.2. ao Sr. Natã Garcia Hora e à Sra. Normanda Sena Torres a multa no valor de R$ 10.000,00 (dez mil reais), com fulcro no art. 58, inc"
+},
+"NORMANDA TORRES SENA": {
+"deb": 45350.37,
+"mul": 0.0,
+"sol": true,
+"ant": false,
+"tr": "9.1.1. Sr. Natã Garcia Hora em solidariedade com a Sra. Normanda Torres Sena: Data Valor (R$) 6/6/2016 100,07 6/6/2016 133,43 6/6/2016 41,90 6/6/2016 55,86 6/6/2016 51,81 6/6/2016 69,08 1º/7/2016 1.111,50 7/7/2016 133,43 7/7/2016 100,07 13/7/2016 1.545,40 13/7/2016 720,79 14/7/2016 1.500,00 15/7/2016 330,00 3/8/2016 503,50 16/8/2016 100,00 17/8/2016 228,00 17/11/2016 330,00 30/11/2016 227,90 1º/12/2016 1.500,00 16/12/2016 227,90 27/12/2016 1.786,00 29/12/2016 6.000,00 29/12/2016 7.720,25 30/12/2016 2.754,80 30/12/2016 150,00 30/12/2016 95,20 5/4/2016 1.745,00 13/4/2016 820,00 19/4/2016 2.358,2"
 }
 },
 "4826/2009-2C": {
@@ -14804,6 +14834,15 @@
 },
 "509/2002-2C": {
 "ADAILTON ANTONIO DE OLIVEIRA": null
+},
+"509/2022-1C": {
+"ANILTON BASTOS PEREIRA": {
+"deb": 80653.84,
+"mul": 10000.0,
+"sol": true,
+"ant": false,
+"tr": "9.2. julgar irregulares as contas de Anilton Bastos Pereira e da empresa José Carlos dos Santos Transportes - ME, condenando-os solidariamente ao recolhimento aos cofres do FNDE da quantia a seguir especificada, atualizada monetariamente e acrescida de juros de mora a partir da data discriminada até a data do pagamento: Data de ocorrência Valor histórico (R$) 31/12/2015 80.653,84  […] 9.3. aplicar a Anilton Bastos Pereira e à empresa José Carlos dos Santos Transportes - ME multa individual de R$ 10.000,00 (dez mil reais), a ser recolhida aos cofres do Tesouro Nacional, com atualização monetária calculada da data deste acórdão até a data do pagamento, se este for efetuado após o v"
+}
 },
 "5099/2018-2C": {
 "ANTONIO CARLOS GUERRA BARRETO": {
@@ -15527,6 +15566,9 @@
 "ant": false,
 "tr": "9.2. julgar irregulares as contas de Manoel Edivan Oliveira da Costa, condenando-o ao pagamento das quantias abaixo discriminadas, atualizadas monetariamente e acrescidas dos juros de mora, calculados a partir da data indicada até a data da efetiva quitação do débito, fixando-lhe o prazo de 15 (quinze) dias, para que comprove, perante o Tribunal, o recolhimento das referidas quantias aos cofres do FNDE, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"b\" e \"c\", da Lei 8.443/1992 c/c os arts. 19 e 23, inciso III, da mesma Lei, e com os arts. 1º, inciso I, 209, I, 210 e 214, inciso II […] 9.3. aplicar a Manoel Edivan Oliveira da Costa a multa prevista no art. 57 da Lei 8.443/1992, no valor de R$ 50.000,00 (cinquenta mil reais) fixando-lhe o prazo de 15 (quinze) dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, III, \"a\", do Regimento Interno do TCU),"
 }
+},
+"549/2022-1C": {
+"TABIRA RAMOS DIAS FERREIRA": null
 },
 "5490/2022-2C": {
 "MARIO RICARDO SANTOS DE LIMA": {
@@ -17450,14 +17492,14 @@
 }
 },
 "6550/2025-2C": {
-"JOSE ROBERIO BATISTA DE OLIVEIRA": {
+"CORDELIA TORRES DE ALMEIDA": {
 "deb": 473557.5,
 "mul": 142400.0,
 "sol": false,
 "ant": false,
 "tr": "9.2. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"b\" e \"c\", da Lei 8.443/1992, c/c os arts. 19 e 23, inciso III, da mesma Lei, as contas dos responsáveis José Roberio Batista de Oliveira e Cordelia Torres de Almeida, condenando-os ao pagamento das importâncias a seguir especificadas, atualizadas monetariamente e acrescidas dos juros de mora, calculadas a partir das datas discriminadas até a data da efetiva quitação do débito, fixando-lhe o prazo de quinze dias, para que comprove, perante o Tribunal, o recolhimento das referidas quantias aos cofres do Tesouro  […] 9.3 aplicar aos responsáveis José Roberio Batista de Oliveira e Cordelia Torres de Almeida, individualmente, a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU, nos valores abaixo discriminados, fixando-lhes o prazo de quinze dias, a contar da notificação, "
 },
-"CORDELIA TORRES DE ALMEIDA": {
+"JOSE ROBERIO BATISTA DE OLIVEIRA": {
 "deb": 473557.5,
 "mul": 142400.0,
 "sol": false,
@@ -19703,19 +19745,19 @@
 "MARIA APARECIDA LAURENTINO DA SILVA": null
 },
 "7863/2022-1C": {
-"MARCOS DA ROCHA MENDES": {
-"deb": 28044.85,
-"mul": 10000.0,
-"sol": false,
-"ant": false,
-"tr": "9.3.1. Marcos da Rocha Mendes: Data de Corecia Valor Histórico (R$) Débito/Crédito 17/10/2012 5.001,85 Débito 17/10/2012 2.798,24 Débito 26/11/2012 1.015,42 Débito 29/11/2012 2.798,24 Débito 07/12/2012 22.077,93 Débito 22/04/2015 5.646,83 Crédito  […] 9.4. aplicar individualmente aos Srs. Marcos da Rocha Mendes ((CPF omitido)) e Alair Francisco Corrêa ((CPF omitido)), a multa prevista no art. 57 da Lei 8.443/1992, c/c o art. 267 do Regimento Interno do TCU, respectivamente, no valor de R$ 10.000,00 (dez mil reais) e de R$ 30.000,00 (trinta mil "
-},
 "ALAIR FRANCISCO CORREA": {
 "deb": 273767.27,
 "mul": 10000.0,
 "sol": false,
 "ant": false,
 "tr": "9.3.2. Alair Francisco Corrêa: Data de Ocorrência Valor Histórico (R$) Débito/Crédito 25/01/2013 140,26 Débito 15/02/2013 18.452,31 Débito 25/04/2013 2.811,75 Débito 09/05/2013 2.811,75 Débito 17/07/2013 253,49 Débito 17/07/2013 971,17 Débito 27/08/2013 2.938,50 Débito 27/08/2013 55.356,93 Débito 27/08/2013 3.398,87 Débito 29/08/2013 2.446,61 Débito 26/09/2013 55.356,93 Débito 24/10/2013 2.913,52 Débito 31/10/2013 36.904,62 Débito 06/11/2013 8.435,26 Débito 18/11/2013 18.452,31 Débito 21/11/2013 21.188,20 Débito 26/11/2013 8.435,26 Débito 03/12/2013 18.452,31 Débito 10/12/2013 2.913,52 Débito  […] 9.4. aplicar individualmente aos Srs. Marcos da Rocha Mendes ((CPF omitido)) e Alair Francisco Corrêa ((CPF omitido)), a multa prevista no art. 57 da Lei 8.443/1992, c/c o art. 267 do Regimento Interno do TCU, respectivamente, no valor de R$ 10.000,00 (dez mil reais) e de R$ 30.000,00 (trinta"
+},
+"MARCOS DA ROCHA MENDES": {
+"deb": 28044.85,
+"mul": 10000.0,
+"sol": false,
+"ant": false,
+"tr": "9.3.1. Marcos da Rocha Mendes: Data de Corecia Valor Histórico (R$) Débito/Crédito 17/10/2012 5.001,85 Débito 17/10/2012 2.798,24 Débito 26/11/2012 1.015,42 Débito 29/11/2012 2.798,24 Débito 07/12/2012 22.077,93 Débito 22/04/2015 5.646,83 Crédito  […] 9.4. aplicar individualmente aos Srs. Marcos da Rocha Mendes ((CPF omitido)) e Alair Francisco Corrêa ((CPF omitido)), a multa prevista no art. 57 da Lei 8.443/1992, c/c o art. 267 do Regimento Interno do TCU, respectivamente, no valor de R$ 10.000,00 (dez mil reais) e de R$ 30.000,00 (trinta mil "
 }
 },
 "7869/2022-1C": {
