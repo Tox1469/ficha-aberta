@@ -8596,19 +8596,19 @@
 }
 },
 "2707/2026-1C": {
-"LEONARDO DICSON SANCHEZ BETIN": {
-"deb": 130412.39,
-"mul": 50000.0,
-"sol": false,
-"ant": false,
-"tr": "9.2. julgar irregulares as contas do Sr. Jarbas da Silva Martini e condená-lo ao pagamento da quantia a seguir especificada, com a fixação de prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno do TCU), o recolhimento da dívida ao Fundo Nacional de Desenvolvimento da Educação, atualizada monetariamente e acrescida dos juros de mora, calculados a partir das datas discriminadas, até a data do recolhimento, na forma prevista na legislação em vigor, com fundamento nos arts. 1º, inciso I, 16, III, alíneas \"a\" e […] 9.5. aplicar ao Sr. Leonardo Dicson Sanchez Betin multa prevista no art. 58, inciso II, da Lei 8.443/1992 c/c o art. 268 do Regimento Interno do TCU, no valor de R$ 50.000,00 (cinquenta mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribuna"
-},
 "JARBAS DA SILVA MARTINI": {
 "deb": 130412.39,
 "mul": 80000.0,
 "sol": false,
 "ant": false,
 "tr": "9.2. julgar irregulares as contas do Sr. Jarbas da Silva Martini e condená-lo ao pagamento da quantia a seguir especificada, com a fixação de prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno do TCU), o recolhimento da dívida ao Fundo Nacional de Desenvolvimento da Educação, atualizada monetariamente e acrescida dos juros de mora, calculados a partir das datas discriminadas, até a data do recolhimento, na forma prevista na legislação em vigor, com fundamento nos arts. 1º, inciso I, 16, III, alíneas \"a\" e […] 9.3. aplicar ao Sr. Jarbas da Silva Martini multa prevista no art. 57 da Lei 8.443/1992, no valor de R$ 80.000,00 (oitenta mil reais), com a fixação do prazo de quinze dias, a contar da notificação, para comprovar, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno), o r"
+},
+"LEONARDO DICSON SANCHEZ BETIN": {
+"deb": 130412.39,
+"mul": 50000.0,
+"sol": false,
+"ant": false,
+"tr": "9.2. julgar irregulares as contas do Sr. Jarbas da Silva Martini e condená-lo ao pagamento da quantia a seguir especificada, com a fixação de prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, inciso III, alínea \"a\", do Regimento Interno do TCU), o recolhimento da dívida ao Fundo Nacional de Desenvolvimento da Educação, atualizada monetariamente e acrescida dos juros de mora, calculados a partir das datas discriminadas, até a data do recolhimento, na forma prevista na legislação em vigor, com fundamento nos arts. 1º, inciso I, 16, III, alíneas \"a\" e […] 9.5. aplicar ao Sr. Leonardo Dicson Sanchez Betin multa prevista no art. 58, inciso II, da Lei 8.443/1992 c/c o art. 268 do Regimento Interno do TCU, no valor de R$ 50.000,00 (cinquenta mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante o Tribuna"
 }
 },
 "2708/2025-2C": {
@@ -12239,19 +12239,19 @@
 }
 },
 "3970/2026-2C": {
-"MANOELITO ARGOLO DOS SANTOS JUNIOR": {
-"deb": 0.0,
-"mul": 15000.0,
-"sol": false,
-"ant": false,
-"tr": "9.5. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alínea \"a\", 19, parágrafo único, e 23, inciso III, da Lei 8.443/1992, as contas de Manoelito Argolo dos Santos Junior, aplicando-lhe a multa prevista no art. 58, inciso II, da Lei 8.443/92, no valor de 15.000,00 (quinze mil "
-},
 "ELIZIO FERNANDES RODRIGUES SIMOES": {
 "deb": 161843.41,
 "mul": 25000.0,
 "sol": false,
 "ant": false,
 "tr": "9.3. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"a\" e \"c\", 19 e 23, inciso III, da Lei 8.443/1992, as contas de Elízio Fernandes Rodrigues Simões, condenando-o ao pagamento da importância a seguir especificada, atualizada monetariamente e acrescida dos juros de mora, calculada a partir da data discriminada até a data da efetiva quitação do débito, fixando-lhe o prazo de quinze dias, para que comprove, perante o Tribunal, o recolhimento da referida quantia aos cofres do Fundo Nacional de Desenvolvimento da Educação, nos termos do art. 23, inciso III, alínea \" […] 9.4. aplicar ao responsável Elizio Fernandes Rodrigues Simoes a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU no valor de R$ 25.000,00 (vinte e cinco mil reais), fixando-lhe o prazo de quinze dias, a contar da notificação, para que comprove, perante o Tr"
+},
+"MANOELITO ARGOLO DOS SANTOS JUNIOR": {
+"deb": 0.0,
+"mul": 15000.0,
+"sol": false,
+"ant": false,
+"tr": "9.5. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alínea \"a\", 19, parágrafo único, e 23, inciso III, da Lei 8.443/1992, as contas de Manoelito Argolo dos Santos Junior, aplicando-lhe a multa prevista no art. 58, inciso II, da Lei 8.443/92, no valor de 15.000,00 (quinze mil "
 }
 },
 "3971/2026-2C": {
@@ -14164,6 +14164,15 @@
 "sol": false,
 "ant": false,
 "tr": "9.5. aplicar-lhes as multas previstas no art. 57 da Lei 8.443/1992, nos valores a seguir especificados, atualizadas monetariamente desde a data deste acórdão até a do efetivo recolhimento, se pagas após o vencimento, na forma da legislação vigente, fixando-lhes o prazo de 15 (quinze) dias, a contar "
+}
+},
+"4714/2026-2C": {
+"SEBASTIAO AURIVALDO PEREIRA SILVA": {
+"deb": 499498.5,
+"mul": 60000.0,
+"sol": false,
+"ant": false,
+"tr": "9.1. julgar, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"a\" e \"c\", e 19 da Lei 8.443/1992, irregulares as contas de Sebastião Aurivaldo Pereira Silva, condenando-o ao pagamento dos débitos discriminados a seguir, atualizados monetariamente e acrescidos dos juros de mora devidos calculados desde as datas de ocorrência indicadas até a da efetiva quitação, na forma da legislação vigente, fixando-lhe o prazo de 15 (quinze) dias, a contar do recebimento da notificação, para que comprove, perante este Tribunal, o recolhimento das referidas quantias aos cofres do Tesouro Nacional, nos […] 9.2. aplicar-lhe a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno, no valor de R$ 60.000,00 (sessenta mil reais), fixando-lhe o prazo de 15 (quinze) dias, a contar do recebimento da notificação, para que comprove, perante este Tribunal, o recolhimento da referid"
 }
 },
 "4718/2018-2C": {
@@ -16296,6 +16305,22 @@
 "sol": false,
 "ant": false,
 "tr": "9.3. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, \"a\", \"b\" e \"c\", da Lei 8.443/1992 c/c os arts. 19 e 23, III, da mesma lei, as contas de Francisco Nagib Buzar de Oliveira, condenando-o ao pagamento das importâncias a seguir especificadas, atualizadas monetariamente e acrescidas dos juros de mora, calculados a partir das datas discriminadas até a data da efetiva quitação do débito, fixando-lhe o prazo de 15 (quinze) dias para que comprove, perante o Tribunal, o recolhimento das referidas quantias aos cofres do Fundo Nacional de Desenvolvimento da Educação, nos termos  […] 9.4. aplicar-lhe a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do RI/TCU, no valor de R$ 10.000,00 (dez mil reais), fixando-lhe o prazo de 15 (quinze) dias, a contar da notificação, para que comprove, perante o Tribunal (art. 214, III, \"a\", do RI/TCU), o recolhimento da dívida ao"
+}
+},
+"592/2026-2C": {
+"ADILSON SOARES DE ALMEIDA": {
+"deb": 994614.07,
+"mul": 150000.0,
+"sol": false,
+"ant": false,
+"tr": "9.3. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"b\" e \"c\", 19 e 23, inciso III, da Lei 8.443/1992, as contas do responsável Adilson Soares de Almeida, condenando-o ao pagamento das importâncias a seguir especificadas, atualizadas monetariamente e acrescidas dos juros de mora, calculadas a partir das datas discriminadas até a data da efetiva quitação do débito, fixando-lhes o prazo de quinze dias, para que comprovem, perante o Tribunal, o recolhimento das referidas quantias aos cofres do Tesouro Nacional, nos termos do art. 23, inciso III, alínea \"a\", da cita […] 9.4. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"a\", \"b\" e \"c\", 19 e 23, inciso III, da Lei 8.443/1992, as contas do responsável Leandro Pereira da Silva, condenando-o ao pagamento das importâncias a seguir especificadas, atualizadas monetariamente e acrescid"
+},
+"LEANDRO PEREIRA DA SILVA": {
+"deb": 131239.34,
+"mul": 150000.0,
+"sol": false,
+"ant": false,
+"tr": "9.4. julgar irregulares, nos termos dos arts. 1º, inciso I, 16, inciso III, alíneas \"a\", \"b\" e \"c\", 19 e 23, inciso III, da Lei 8.443/1992, as contas do responsável Leandro Pereira da Silva, condenando-o ao pagamento das importâncias a seguir especificadas, atualizadas monetariamente e acrescidas dos juros de mora, calculadas a partir das datas discriminadas até a data da efetiva quitação do débito, fixando-lhes o prazo de quinze dias, para que comprovem, perante o Tribunal, o recolhimento das referidas quantias aos cofres do Tesouro Nacional, nos termos do art. 23, inciso III, alínea \"a\", da  […] 9.5. aplicar, individualmente, aos responsáveis Adilson Soares de Almeida e Leandro Pereira da Silva a multa prevista no art. 57 da Lei 8.443/1992 c/c o art. 267 do Regimento Interno do TCU, nos valores de R$ 150.000,00 (cento e cinquenta mil reais) e R$ 20.000,00 (vinte mil reais), respectivam"
 }
 },
 "5924/2019-1C": {
